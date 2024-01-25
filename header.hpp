@@ -107,6 +107,66 @@ int cshift(int& xp, int& yp, const int x, const int y, const int mu){
 }
 
 
+int cshift_minus(int& xp, int& yp, const int x, const int y, const int mu){
+  int res = 1;
+
+  if(mu==0){
+    xp=mod(x+1,Lx);
+    yp=y;
+
+    if(x==Lx-1) res *= -1;
+  }
+  else if(mu==1){
+    xp=mod(x-1,Lx);
+    yp=mod(y+1,Ly);
+
+    if(x==0) res *= -1;
+    if(y==Ny-1) {
+      // xp=mod(xp-int(Ly/2),Lx);
+      res *= -1;
+    }
+  }
+  else if(mu==2){
+    xp=x;
+    yp=mod(y-1,Ly);
+
+    if(y==0) {
+      // xp=mod(xp+int(Ly/2),Lx);
+      res *= -1;
+    }
+  }
+  else if(mu==3){
+    xp=mod(x-1,Lx);
+    yp=y;
+
+    if(x==0) res *= -1;
+  }
+  else if(mu==4){
+    xp=mod(x+1,Lx);
+    yp=mod(y-1,Ly);
+
+    if(x==Lx-1) res *= -1;
+    if(y==0) {
+      // xp=mod(xp+int(Ly/2),Lx);
+      res *= -1;
+    }
+  }
+  else if(mu==5){
+    xp=x;
+    yp=mod(y+1,Ly);
+
+    if(y==Ly-1) {
+      // xp=mod(xp-int(Ly/2),Lx);
+      res *= -1;
+    }
+  }
+  else assert(false);
+
+  return res;
+}
+
+
+
 V2 get_e( const int mu ){
   V2 res;
 

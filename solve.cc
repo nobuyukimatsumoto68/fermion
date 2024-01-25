@@ -18,7 +18,7 @@
 int main(){
 
 #ifdef _OPENMP
-  omp_set_num_threads( 8 );
+  omp_set_num_threads( nparallel );
 #endif
 
 
@@ -34,7 +34,7 @@ int main(){
   // std::cout << Dinv0 << std::endl;
 
   {
-    std::ofstream of( "./data/Dinv0.dat",
+    std::ofstream of( dir_data+description+"Dinv0.dat",
                       std::ios::out | std::ios::binary | std::ios::trunc);
     if(!of) assert(false);
 
@@ -54,7 +54,7 @@ int main(){
   const Vect Dinv1 = CG(init, e1);
 
   {
-    std::ofstream of( "./data/Dinv1.dat",
+    std::ofstream of( dir_data+description+"Dinv1.dat",
                       std::ios::out | std::ios::binary | std::ios::trunc);
     if(!of) assert(false);
 

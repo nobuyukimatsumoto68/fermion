@@ -9,3 +9,6 @@ solve.o: solve.cc header.hpp constants_and_typedefs.hpp
 
 eps.o: eps_corr.cc header.hpp constants_and_typedefs.hpp
 	$(CXX) $< $(CXXFLAGS) $(INCLUDES) -o $@
+
+tt.o: tt_corr.cc header.hpp constants_and_typedefs.hpp
+	$(CXX) $< $(CXXFLAGS) $(INCLUDES) -o $@

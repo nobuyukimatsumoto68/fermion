@@ -26,7 +26,7 @@ int main(){
   Vect Dinv1(2*Lx*Ly);
 
   {
-    std::ifstream ifs( "Dinv0.dat",
+    std::ifstream ifs( dir_data+description+"Dinv0.dat",
                        std::ios::in | std::ios::binary );
     if(!ifs) assert(false);
 
@@ -40,7 +40,7 @@ int main(){
 
 
   {
-    std::ifstream ifs( "Dinv1.dat",
+    std::ifstream ifs( dir_data+description+"Dinv1.dat",
                        std::ios::in | std::ios::binary );
     if(!ifs) assert(false);
 
@@ -93,14 +93,31 @@ int main(){
   eps << 0, 1, -1, 0;
   eps_inv << 0, -1, 1, 0;
 
-  for(int x=0; x<Lx; x++){
+  {
+    std::ofstream of( dir_data+description+"eps.dat",
+                      std::ios::out | std::ios::trunc);
+    if(!of) assert(false);
+    of << std::scientific << std::setprecision(15);
+
     for(int y=0; y<Ly; y++){
-      if(!is_site(x,y)) continue;
-      M2 dinv = Dinv_n_0[idx(x,y)];
-      M2 tmp = eps_inv.transpose() * dinv.transpose() * eps * dinv;
-      Complex corr = 2.0 * tmp.trace();
-      std::cout << x << " " << y << " " << corr.real() << " " << corr.imag() << std::endl;
-    }}
+      for(int x=0; x<Lx; x++){
+        if(!is_site(x,y)) continue;
+        const int c = mod(x-y, 3);
+        M2 dinv = Dinv_n_0[idx(x,y)];
+        M2 tmp = eps_inv.transpose() * dinv.transpose() * eps * dinv;
+        Complex corr = 2.0 * tmp.trace();
+        of << x << " " << y << " " << corr.real() << " " << corr.imag() << " " << c << std::endl;
+      }}
+  }
+
+  // for(int x=0; x<Lx; x++){
+  //   for(int y=0; y<Ly; y++){
+  //     if(!is_site(x,y)) continue;
+  //     M2 dinv = Dinv_n_0[idx(x,y)];
+  //     M2 tmp = eps_inv.transpose() * dinv.transpose() * eps * dinv;
+  //     Complex corr = 2.0 * tmp.trace();
+  //     std::cout << x << " " << y << " " << corr.real() << " " << corr.imag() << std::endl;
+  //   }}
 
 
   // std::cout << "Dinv1 = " << std::endl
