@@ -1,1 +1,3 @@
 data/
+*.o
+.DS_Store

@@ -73,44 +73,62 @@ int main(){
 
   std::array<M2, 6> gamma;
   {
-    for(int mu=0; mu<SIX; mu++){
-      V2 emu = get_e( mu );
-      gamma[mu] = e(0)*sigma[2] + e(1)*sigma[1];
+    for(int b=0; b<SIX; b++){
+      V2 e = get_e( b );
+      gamma[b] = e(0)*sigma[2] + e(1)*sigma[1];
     }
   }
 
   // PACKAGE IT!!!
 
   {
-    std::ofstream of( dir_data+description+"tt.dat",
-                      std::ios::out | std::ios::trunc);
-    if(!of) assert(false);
-    of << std::scientific << std::setprecision(15);
+#ifdef _OPENMP
+#pragma omp parallel for collapse(2)
+#endif
+    for(int a=0; a<THREE; a++){
+      for(int c=0; c<THREE; c++){
+        const M2 eps_gamma_a = eps_inv.transpose() * gamma[a].transpose();
+        const M2 eps_gamma_c = eps * gamma[c];
+        for(int s=0; s<THREE; s++){ for(int b=0; b<THREE; b++){
 
-    for(int y=0; y<Ly; y++){
-      for(int x=0; x<Lx; x++){
-        if(!is_site(x,y)) continue;
-        const int c = mod(x-y, 3);
-        if(c==0){
-          M2 dinv = Dinv_n_0[idx(x,y)];
+            // inside loop
+            std::ofstream of( dir_data+description+"tt"+std::to_string(a)+std::to_string(b)+std::to_string(c)+std::to_string(s)+".dat",
+                              std::ios::out | std::ios::trunc);
+            if(!of) assert(false);
+            of << std::scientific << std::setprecision(15);
+            // Complex tmp[Lx][Ly];
 
-          for(int sigma=0; sigma<THREE; sigma++){
-            for(int nu=0; nu<THREE; nu++){
-              int xp, yp;
-              cshift(sp, yp, x, y, sigma);
-              cshift_minus(xp, yp, xp, yp, nu);
-              M2 dinv_p = Dinv_n_0[idx(xp,yp)];
+            // inside loop
+            for(int y=0; y<Ly; y++){
+              for(int x=0; x<Lx; x++){
+                if(!is_site(x,y)) continue;
 
-              for(int mu=0; mu<THREE; mu++){
-                for(int rho=0; rho<THREE; rho++){
-                  M2 tmp = eps_inv * gamma[mu].transpose() * dinv.transpose() * gamma[rho].transpose() * eps * dinv;
-                  Complex corr = 2.0 * tmp.trace();
+                const int ch = mod(x-y, 3);
+                if(ch==0){
+                  const M2 dinv_x = Dinv_n_0[idx(x,y)];
+
+                  int xps, yps;
+                  int sign1 = cshift(xps, yps, x, y, s);
+                  const M2 dinv_xps = sign1 * Dinv_n_0[idx(xps,yps)];
+
+                  int xmb, ymb;
+                  int sign2 = cshift_minus(xmb, ymb, x, y, b);
+                  int xpsmb, ypsmb;
+                  int sign3 = cshift(xpsmb, ypsmb, xmb, ymb, s);
+                  const M2 dinv_xmb = sign2*Dinv_n_0[idx(xmb,ymb)];
+                  const M2 dinv_xpsmb = sign2*sign3*Dinv_n_0[idx(xpsmb,ypsmb)];
+
+                  const Complex tr1 = ( eps_gamma_a * dinv_x.transpose() * eps_gamma_c * dinv_xpsmb ).trace();
+                  const Complex tr2 = ( eps_gamma_a * dinv_xps.transpose() * eps_gamma_c * dinv_xmb ).trace();
+                  const Complex corr = tr1 - tr2;
+                  // tmp[x][y][a][b][c][s] = tmp1.trace() - tmp2.trace();
                   of << x << " " << y << " "
-                     << mu << " " << nu << " " << rho << " " << sigma << " "
-                     << corr.real() << " " << corr.imag() << " " << c << std::endl;
-                }}
-            }}
-        }
+                     << corr.real() << " " << corr.imag() << " "
+                     << ch << " " << a << " " << b << " " << c << " " << s << " " << std::endl;
+                } // end if
+
+              }} // end for x,y
+          }}
       }}
   }
 

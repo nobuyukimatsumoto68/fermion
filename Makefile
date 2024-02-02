@@ -1,14 +1,23 @@
-CXX = g++-13
-CXXFLAGS = -O3 -std=c++11 -fopenmp
+CXX = g++
+CXXFLAGS = -O3 -std=c++11
 INCLUDES = -I/usr/local/include/eigen-3.4.0
 
-all: solve.o eps.o
+NVCC = nvcc
+NVCCFLAGS = -O3 -arch=sm_70
+INCLUDES_CUDA =
 
-solve.o: solve.cc header.hpp constants_and_typedefs.hpp
+
+# all: solve.o solve.o eps.o tt.o
+all: solve.o solve_test.o
+
+solve.o: solve.cu header_cuda.hpp typedefs_cuda.hpp constants.hpp
+	$(NVCC) $< $(NVCCFLAGS) $(INCLUDES_CUDA) -o $@
+
+solve_test.o: solve_test.cc header.hpp typedefs_cuda.hpp constants.hpp
 	$(CXX) $< $(CXXFLAGS) $(INCLUDES) -o $@
 
-eps.o: eps_corr.cc header.hpp constants_and_typedefs.hpp
-	$(CXX) $< $(CXXFLAGS) $(INCLUDES) -o $@
+# eps.o: eps_corr.cc header.hpp constants_and_typedefs.hpp
+# 	$(CXX) $< $(CXXFLAGS) $(INCLUDES) -o $@
 
-tt.o: tt_corr.cc header.hpp constants_and_typedefs.hpp
-	$(CXX) $< $(CXXFLAGS) $(INCLUDES) -o $@
+# tt.o: tt_corr.cc header.hpp constants_and_typedefs.hpp
+# 	$(CXX) $< $(CXXFLAGS) $(INCLUDES) -o $@
