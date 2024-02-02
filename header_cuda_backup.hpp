@@ -4,6 +4,10 @@
 #include <array>
 #include <cassert>
 
+// #include <Eigen/Dense>
+// #include <Eigen/Eigenvalues>
+
+
 #include "typedefs_cuda.hpp"
 #include "constants.hpp"
 
@@ -59,6 +63,7 @@ void cudacheck( cudaError status ){
 
 __host__
 void set2zero( double* v, const Idx size ){ for(Idx i=0; i<size; i++) v[i] = 0.0; }
+
 __host__
 void set2zero( Complex* v, const Idx size ){ for(Idx i=0; i<size; i++) v[i] = cplx(0.0); }
 
@@ -68,11 +73,14 @@ void set_zero(double* d_v){
   Idx i = blockIdx.x*blockDim.x + threadIdx.x;
   if(i<N) d_v[i] = 0.0;
 }
+
+
 __global__
 void set_zero(Complex* d_v){
   Idx i = blockIdx.x*blockDim.x + threadIdx.x;
   if(i<N) d_v[i] = cplx(0.0);
 }
+
 
 
 __host__ __device__
@@ -88,7 +96,8 @@ void get_xy(int& x, int& y, const Idx i){
 
 
 __host__ __device__
-int mod(const int a, const int b){ return (b +(a%b))%b; }
+int mod(const int a, const int b){ return (10*b+a)%b; }
+// int mod(const int a, const int b){ return (b +(a%b))%b; }
 
 
 __host__ __device__
@@ -198,10 +207,10 @@ int cshift_minus(int& xp, int& yp, const int x, const int y, const int mu){
 
     if(x==0) res *= -1;
     if(y==Ly-1) {
-      if(is_periodic_orthogonal) {
-        if(Lx<=xp+Ly/2) res *= -1;
-        xp=mod(xp+int(Ly/2),Lx);
-      }
+      // if(is_periodic_orthogonal) {
+      //   if(Lx<=xp+Ly/2) res *= -1;
+      //   xp=mod(xp+int(Ly/2),Lx);
+      // }
       res *= -1;
     }
   }
@@ -210,10 +219,10 @@ int cshift_minus(int& xp, int& yp, const int x, const int y, const int mu){
     yp=mod(y-1,Ly);
 
     if(y==0) {
-      if(is_periodic_orthogonal) {
-        if(xp-Ly/2<0) res *= -1;
-        xp=mod(xp-int(Ly/2),Lx);
-      }
+      // if(is_periodic_orthogonal) {
+      //   if(xp-Ly/2<0) res *= -1;
+      //   xp=mod(xp-int(Ly/2),Lx);
+      // }
       res *= -1;
     }
   }
@@ -229,10 +238,10 @@ int cshift_minus(int& xp, int& yp, const int x, const int y, const int mu){
 
     if(x==Lx-1) res *= -1;
     if(y==0) {
-      if(is_periodic_orthogonal) {
-        if(xp-Ly/2<0) res *= -1;
-        xp=mod(xp-int(Ly/2),Lx);
-      }
+      // if(is_periodic_orthogonal) {
+      //   if(xp-Ly/2<0) res *= -1;
+      //   xp=mod(xp-int(Ly/2),Lx);
+      // }
       res *= -1;
     }
   }
@@ -241,10 +250,10 @@ int cshift_minus(int& xp, int& yp, const int x, const int y, const int mu){
     yp=mod(y+1,Ly);
 
     if(y==Ly-1) {
-      if(is_periodic_orthogonal) {
-        if(Lx<=xp+Ly/2) res *= -1;
-        xp=mod(xp+int(Ly/2),Lx);
-      }
+      // if(is_periodic_orthogonal) {
+      //   if(Lx<=xp+Ly/2) res *= -1;
+      //   xp=mod(xp+int(Ly/2),Lx);
+      // }
       res *= -1;
     }
   }
@@ -284,13 +293,11 @@ void get_e( double* res, const int mu ){
 }
 
 
-
 __global__
 void daxpy(Complex* d_res, Complex* d_a, Complex* d_x, Complex* d_y){
   Idx i = blockIdx.x*blockDim.x + threadIdx.x;
   if(i<N) d_res[i] = *d_a * d_x[i] + d_y[i];
 }
-
 
 
 __device__
@@ -304,7 +311,6 @@ void Wilson_projector( Complex* res, const int mu ){
   res[1] = -0.5 * ( e[0]-cuI*e[1] );
   res[2] = -0.5 * ( e[0]+cuI*e[1] );
 }
-
 
 
 __global__
@@ -334,6 +340,7 @@ void multD ( Complex* res, const Complex* v ){
     }
   }
 }
+
 
 
 
@@ -459,6 +466,7 @@ void dot_normalized_wrapper(Complex& scalar, Complex* d_scalar, Complex* d_p, Co
   cudacheck(cudaMemcpy(&scalar, d_scalar, CD, D2H));
 }
 
+
 __host__
 void dot2self_normalized_wrapper(double& scalar, Complex* d_scalar, Complex* d_p){
   scalar = 0.0;
@@ -542,3 +550,97 @@ void solve(Complex x[N], Complex b[N], const double tol=1.0e-15, const int maxit
   cudacheck(cudaFree(d_scalar));
 }
 
+
+// Vect CG(const Vect& init,
+//         const Vect& b,
+//         const double TOL=1.0e-15,
+//         const int MAXITER=1e5
+//         ){
+//   Vect x = init; //Vect::Zero(ops.size);
+//   Vect r = b; // b - A(x);
+//   Vect p = r;
+
+//   double mu = r.squaredNorm();
+//   double mu_old = mu;
+//   const double b_norm_sq = b.squaredNorm();
+//   const double mu_crit = TOL*TOL*b_norm_sq;
+
+//   if(mu<mu_crit){
+//     std::clog << "NO SOLVE" << std::endl;
+//   }
+//   else{
+//     int k=0;
+//     for(; k<MAXITER; ++k){
+//       const Vect q = A(p);
+//       const Complex gam = p.dot(q);
+//       const Complex al = mu/gam;
+//       x += al*p;
+//       r -= al*q;
+//       mu = r.squaredNorm();
+//       std::clog << "mu = " << mu << std::endl;
+//       if(mu<mu_crit) break;
+//       const double bet = mu/mu_old;
+//       mu_old = mu;
+//       p = r+bet*p;
+//     }
+//     std::clog << "SOLVER:       #iterations: " << k << std::endl;
+//   }
+
+//   std::clog << "error1: " << std::sqrt(mu/b_norm_sq) << std::endl
+//             << "error2: " << std::sqrt(r.squaredNorm()/b_norm_sq) << std::endl;
+
+//   return x;
+// }
+
+
+
+
+
+// __device__ __host__ inline double abs(const Complex c ){ return cuCabs(c); }
+// inline double ang(const Complex c ){ return atan2(imag(c),real(c)); }
+
+// Complex exp(const Complex c ){
+//   Complex res;
+//   double re = real(c);
+//   double im = imag(c);
+//   res = cplx(exp(re));
+//   res = res * (cplx(cos(im)) + I*cplx(sin(im)));
+//   return res; }
+// Complex log(const Complex c ){
+//   Complex res;
+//   double ab = abs(c);
+//   double an = ang(c);
+//   res = cplx(log(ab));
+//   res = res + I*cplx(an);
+//   return res; }
+// Complex cosh(const Complex c ){
+//   return (exp(c)+ exp(-c))/2.0; }
+// Complex sinh(const Complex c ){
+//   return (exp(c) - exp(-c))/2.0; }
+// Complex tanh(const Complex c ){
+//   return sinh(c)/cosh(c); }
+// double factorial(const int x){
+//   double res = 1.0;
+//   if(!(x==0)) for(int i=1;i<=x;i++) res = res * i;
+//   return res;
+// }
+// Complex pow(const Complex c , const int n){
+//   double re = real(c);
+//   double im = imag(c);
+//   Complex res = cplx(0.0);
+//   double factor;
+//   int rem;
+//   for(int i=0;i<n;i++) {
+//     factor = factorial(n)/(factorial(i)*factorial(n-i));
+//     rem = i%4;
+//     switch(rem){
+//     case 0 : res = res + cplx(factor*pow(re,n-i)*pow(im,i));
+//       break;
+//     case 1 : res = res + I*cplx(factor*pow(re,n-i)*pow(im,i));
+//       break;
+//     case 2 : res = res - cplx(factor*pow(re,n-i)*pow(im,i));
+//       break;
+//     case 3 : res = res - I*cplx(factor*pow(re,n-i)*pow(im,i));
+//       break;
+//     }}
+//   return res; }

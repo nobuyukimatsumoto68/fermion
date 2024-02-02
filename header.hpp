@@ -315,12 +315,12 @@ Eigen::VectorXcd multDdagger_eigen ( const Eigen::VectorXcd& v){
 #endif
   for(int y=0; y<Ly; y++) for(int x=0; x<Lx; x++) {
       for(int mu=0; mu<SIX; mu++){
-        if( is_link(x,y,mu) ) {
+        if( is_link(x,y, (mu+THREE)%SIX) ) {
           int xp, yp;
-          const int sign = cshift( xp, yp, x, y, mu );
+          const int sign = cshift_minus( xp, yp, x, y, mu );
           const Idx idx1 = 2*idx(x,y);
           const Idx idx2 = 2*idx(xp,yp);
-          res.segment(idx2, 2) += sign * 0.5 * kappa * Wilson_projector(mu).adjoint() * v.segment(idx1, 2);
+          res.segment(idx1, 2) += sign * 0.5 * kappa * Wilson_projector(mu) * v.segment(idx2, 2);
         }
       }
     }
@@ -364,7 +364,7 @@ Vect CG(const Vect& init,
       x += al*p;
       r -= al*q;
       mu = r.squaredNorm();
-      std::clog << "mu = " << mu << std::endl;
+      // std::clog << "mu = " << mu << std::endl;
       if(mu<mu_crit) break;
       const double bet = mu/mu_old;
       mu_old = mu;

@@ -9,7 +9,8 @@
 #include <Eigen/Dense>
 // #include <Eigen/Eigenvalues>
 
-#include "constants_and_typedefs.hpp"
+#include "typedefs.hpp"
+#include "constants.hpp"
 #include "header.hpp"
 
 // ======================================
@@ -18,15 +19,19 @@
 
 int main(){
 
-// #ifdef _OPENMP
-//   omp_set_num_threads( 4 );
-// #endif
+#ifdef _OPENMP
+  omp_set_dynamic(0);
+  omp_set_num_threads( nparallel );
+#endif
 
   Vect Dinv0(2*Lx*Ly);
   Vect Dinv1(2*Lx*Ly);
 
+  Vect Dinv0_cuda(2*Lx*Ly);
+  Vect Dinv1_cuda(2*Lx*Ly);
+
   {
-    std::ifstream ifs( dir_data+description+"Dinv0.dat",
+    std::ifstream ifs( dir_data+description_old+"Dinv0.dat",
                        std::ios::in | std::ios::binary );
     if(!ifs) assert(false);
 
@@ -40,7 +45,7 @@ int main(){
 
 
   {
-    std::ifstream ifs( dir_data+description+"Dinv1.dat",
+    std::ifstream ifs( dir_data+description_old+"Dinv1.dat",
                        std::ios::in | std::ios::binary );
     if(!ifs) assert(false);
 
@@ -52,8 +57,43 @@ int main(){
     }
   }
 
+  {
+    std::ifstream ifs( dir_data+description+"Dinv0_cuda.dat",
+                       std::ios::in | std::ios::binary );
+    if(!ifs) assert(false);
+
+    double real, imag;
+    for(Idx i=0; i<2*Lx*Ly; ++i){
+      ifs.read((char*) &real, sizeof(double) );
+      ifs.read((char*) &imag, sizeof(double) );
+      Dinv0_cuda[i] = real + I*imag;
+    }
+  }
+
+
+  {
+    std::ifstream ifs( dir_data+description+"Dinv1_cuda.dat",
+                       std::ios::in | std::ios::binary );
+    if(!ifs) assert(false);
+
+    double real, imag;
+    for(Idx i=0; i<2*Lx*Ly; ++i){
+      ifs.read((char*) &real, sizeof(double) );
+      ifs.read((char*) &imag, sizeof(double) );
+      Dinv1_cuda[i] = real + I*imag;
+    }
+  }
+
+  // std::cout << (Dinv0 - Dinv0_cuda).norm() << std::endl;
+  // std::cout << (Dinv1 - Dinv1_cuda).norm() << std::endl;
+
+  // std::cout << Dinv0 - Dinv0_cuda << std::endl;
+
+
   // -----------------------------------
 
+  Dinv0 = Dinv0_cuda;
+  Dinv1 = Dinv1_cuda;
 
   std::vector<M2> Dinv_n_0(Lx*Ly);
 
@@ -83,13 +123,20 @@ int main(){
 
   {
 #ifdef _OPENMP
-#pragma omp parallel for collapse(2)
+#pragma omp parallel for collapse(4) num_threads(nparallel)
 #endif
     for(int a=0; a<THREE; a++){
       for(int c=0; c<THREE; c++){
-        const M2 eps_gamma_a = eps_inv.transpose() * gamma[a].transpose();
-        const M2 eps_gamma_c = eps * gamma[c];
-        for(int s=0; s<THREE; s++){ for(int b=0; b<THREE; b++){
+        for(int s=0; s<THREE; s++){
+          for(int b=0; b<THREE; b++){
+
+            const M2 eps_gamma_a = eps_inv.transpose() * gamma[a].transpose();
+            const M2 eps_gamma_c = eps * gamma[c];
+
+#ifdef _OPENMP
+#pragma omp critical
+#endif
+            { std::clog << "a = " << a << ", b = " << b << ", c = " << c << ", d = " << s << std::endl; }
 
             // inside loop
             std::ofstream of( dir_data+description+"tt"+std::to_string(a)+std::to_string(b)+std::to_string(c)+std::to_string(s)+".dat",
