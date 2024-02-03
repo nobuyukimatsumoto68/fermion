@@ -13,14 +13,14 @@ const int THREE = 3;
 const int SIX = 6;
 
 const double m = 0.0;
-const int Lx = 6 * 4;
-const int Ly = 6 * 4;
+// const int Lx = 6 * 4;
+// const int Ly = 6 * 4;
 // const int Lx = 6 * 6;
 // const int Ly = 6 * 6;
 // const int Lx = 6 * 128;
 // const int Ly = 6 * 128;
-// const int Lx = 6 * 512;
-// const int Ly = 6 * 512;
+const int Lx = 6 * 512;
+const int Ly = 6 * 512;
 
 // const double m = 2.0;
 // const int Lx = 6 * 512;
