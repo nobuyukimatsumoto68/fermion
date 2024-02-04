@@ -9,7 +9,8 @@
 #include <Eigen/Dense>
 // #include <Eigen/Eigenvalues>
 
-#include "constants_and_typedefs.hpp"
+#include "typedefs.hpp"
+#include "constants.hpp"
 #include "header.hpp"
 
 // ======================================
