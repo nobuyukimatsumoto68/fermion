@@ -17,10 +17,16 @@ const double m = 0.0;
 // const int Ly = 6 * 4;
 // const int Lx = 6 * 6;
 // const int Ly = 6 * 6;
+// const int Lx = 6 * 64;
+// const int Ly = 6 * 64;
 const int Lx = 6 * 128;
 const int Ly = 6 * 128;
+// const int Lx = 6 * 256;
+// const int Ly = 6 * 256;
 // const int Lx = 6 * 512;
 // const int Ly = 6 * 512;
+// const int Lx = 6 * 1024;
+// const int Ly = 6 * 1024;
 
 // const double m = 2.0;
 // const int Lx = 6 * 512;

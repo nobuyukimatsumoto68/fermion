@@ -7,7 +7,7 @@ NVCCFLAGS = -O3 -arch=sm_70
 INCLUDES_CUDA =
 
 
-DIR = runfiles/
+DIR = ./
 
 
 # all: solve.o solve.o eps.o tt.o
