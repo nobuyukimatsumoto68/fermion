@@ -9,7 +9,8 @@
 #include <Eigen/Dense>
 // #include <Eigen/Eigenvalues>
 
-#include "constants_and_typedefs.hpp"
+#include "typedefs.hpp"
+#include "constants.hpp"
 #include "header.hpp"
 
 // ======================================
@@ -26,7 +27,7 @@ int main(){
   Vect Dinv1(2*Lx*Ly);
 
   {
-    std::ifstream ifs( dir_data+description+"Dinv0.dat",
+    std::ifstream ifs( dir_data+description+"Dinv0_cuda.dat",
                        std::ios::in | std::ios::binary );
     if(!ifs) assert(false);
 
@@ -40,7 +41,7 @@ int main(){
 
 
   {
-    std::ifstream ifs( dir_data+description+"Dinv1.dat",
+    std::ifstream ifs( dir_data+description+"Dinv1_cuda.dat",
                        std::ios::in | std::ios::binary );
     if(!ifs) assert(false);
 
