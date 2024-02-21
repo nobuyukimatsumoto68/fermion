@@ -1,4 +1,4 @@
-#!/bin/bash -l
+#1;95;0c!/bin/bash -l
 
 # https://www.bu.edu/tech/support/research/system-usage/running-jobs/submitting-jobs/
 # to submit: qsub script.sh
@@ -7,13 +7,13 @@
 #$ -P qfe
 #$ -M mtsmtnbyk@gmail.com
 ##### run time limit. format: hh:mm:ss; default 12 hrs
-#$ -l h_rt=1:00:00
+#$ -l h_rt=0:30:00
 ##### merge error and output
 #$ -j y
 ##### email options; begins (b), ends (e), is aborted (a), is suspended (s), or never (n) - default
 #$ -m beas
 
-#$ -pe omp 8
+#$ -pe omp 4
 
 # --------- job info -----------#
 
@@ -34,6 +34,6 @@ OMP_NUM_THREADS=$NSLOTS
 echo "running program"
 date
 pwd
-time ./tt.o
+time ./t_vev.o
 echo "finished"
 date
