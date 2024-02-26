@@ -67,9 +67,9 @@ int main(){
     }
   }
 
-  M2 eps, eps_inv;
-  eps << 0, 1, -1, 0;
-  eps_inv << 0, -1, 1, 0;
+  // M2 eps, eps_inv;
+  // eps << 0, 1, -1, 0;
+  // eps_inv << 0, -1, 1, 0;
 
   {
     std::ofstream of[4];
