@@ -256,7 +256,7 @@ Eigen::MatrixXcd get_Dirac_matrix (){
           const int sign = cshift( xp, yp, x, y, mu );
           const Idx idx1 = 2*idx(x,y);
           const Idx idx2 = 2*idx(xp,yp);
-          res.block<2,2>(idx1, idx2) = sign * 0.5 * kappa * Wilson_projector(mu);
+          res.block<2,2>(idx1, idx2) = -sign * 0.5 * kappa * Wilson_projector(mu);
         }
       }
     }
@@ -288,7 +288,7 @@ Eigen::VectorXcd multD_eigen ( const Eigen::VectorXcd& v ){
           const int sign = cshift( xp, yp, x, y, mu );
           const Idx idx1 = 2*idx(x,y);
           const Idx idx2 = 2*idx(xp,yp);
-          res.segment(idx1, 2) += sign * 0.5 * kappa * Wilson_projector(mu) * v.segment(idx2, 2);
+          res.segment(idx1, 2) -= sign * 0.5 * kappa * Wilson_projector(mu) * v.segment(idx2, 2);
         }
       }
     }
@@ -320,7 +320,7 @@ Eigen::VectorXcd multDdagger_eigen ( const Eigen::VectorXcd& v){
           const int sign = cshift_minus( xp, yp, x, y, mu );
           const Idx idx1 = 2*idx(x,y);
           const Idx idx2 = 2*idx(xp,yp);
-          res.segment(idx1, 2) += sign * 0.5 * kappa * Wilson_projector(mu) * v.segment(idx2, 2);
+          res.segment(idx1, 2) -= sign * 0.5 * kappa * Wilson_projector(mu) * v.segment(idx2, 2);
         }
       }
     }

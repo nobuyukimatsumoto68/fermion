@@ -14,7 +14,7 @@
 #define N (2*Lx*Ly)
 #define M (Lx*Ly)
 
-#define NThreadsPerBlock (256) // 1024
+#define NThreadsPerBlock (512) // 1024
 #define NBlocks (N+NThreadsPerBlock)/NThreadsPerBlock
 #define H2D (cudaMemcpyHostToDevice)
 #define D2H (cudaMemcpyDeviceToHost)
@@ -101,11 +101,12 @@ bool is_site(const int x, const int y) {
 
 
 __host__ __device__
-bool is_link(const int x, const int y, const int mu) {
-  const int c = mod(x-y, 3);
+int is_link(const int x, const int y, const int mu) { // return c or -1
+  int c = mod(x-y, 3);
   bool res = false;
   if(c==0 && mu<3) res = true; // e.g., (0,0)
   else if(c==2 && mu>=3) res = true; // e.g., (0,1)
+  // if (!res) c = -1;
   return res;
 }
 
@@ -198,10 +199,10 @@ int cshift_minus(int& xp, int& yp, const int x, const int y, const int mu){
 
     if(x==0) res *= -1;
     if(y==Ly-1) {
-      if(is_periodic_orthogonal) {
-        if(Lx<=xp+Ly/2) res *= -1;
-        xp=mod(xp+int(Ly/2),Lx);
-      }
+      // if(is_periodic_orthogonal) {
+      //   if(Lx<=xp+Ly/2) res *= -1;
+      //   xp=mod(xp+int(Ly/2),Lx);
+      // }
       res *= -1;
     }
   }
@@ -210,10 +211,10 @@ int cshift_minus(int& xp, int& yp, const int x, const int y, const int mu){
     yp=mod(y-1,Ly);
 
     if(y==0) {
-      if(is_periodic_orthogonal) {
-        if(xp-Ly/2<0) res *= -1;
-        xp=mod(xp-int(Ly/2),Lx);
-      }
+      // if(is_periodic_orthogonal) {
+      //   if(xp-Ly/2<0) res *= -1;
+      //   xp=mod(xp-int(Ly/2),Lx);
+      // }
       res *= -1;
     }
   }
@@ -229,10 +230,10 @@ int cshift_minus(int& xp, int& yp, const int x, const int y, const int mu){
 
     if(x==Lx-1) res *= -1;
     if(y==0) {
-      if(is_periodic_orthogonal) {
-        if(xp-Ly/2<0) res *= -1;
-        xp=mod(xp-int(Ly/2),Lx);
-      }
+      // if(is_periodic_orthogonal) {
+      //   if(xp-Ly/2<0) res *= -1;
+      //   xp=mod(xp-int(Ly/2),Lx);
+      // }
       res *= -1;
     }
   }
@@ -241,10 +242,10 @@ int cshift_minus(int& xp, int& yp, const int x, const int y, const int mu){
     yp=mod(y+1,Ly);
 
     if(y==Ly-1) {
-      if(is_periodic_orthogonal) {
-        if(Lx<=xp+Ly/2) res *= -1;
-        xp=mod(xp+int(Ly/2),Lx);
-      }
+      // if(is_periodic_orthogonal) {
+      //   if(Lx<=xp+Ly/2) res *= -1;
+      //   xp=mod(xp+int(Ly/2),Lx);
+      // }
       res *= -1;
     }
   }
@@ -294,15 +295,17 @@ void daxpy(Complex* d_res, Complex* d_a, Complex* d_x, Complex* d_y){
 
 
 __device__
-void Wilson_projector( Complex* res, const int mu ){
+void Wilson_projector( Complex* res, const int mu, const int sign = +1 ){
   double e[2];
   get_e(e, mu);
 
   res[0] = cplx(0.5);
   res[3] = cplx(0.5);
 
-  res[1] = -0.5 * ( e[0]-cuI*e[1] );
-  res[2] = -0.5 * ( e[0]+cuI*e[1] );
+  res[1] = - sign * 0.5 * ( e[0]-cuI*e[1] );
+  res[2] = - sign * 0.5 * ( e[0]+cuI*e[1] );
+  // res[1] = 0.5 * ( e[0]-cuI*e[1] );
+  // res[2] = 0.5 * ( e[0]+cuI*e[1] );
 }
 
 
@@ -320,6 +323,7 @@ void multD ( Complex* res, const Complex* v ){
     }
 
     for(int mu=0; mu<SIX; mu++){
+      // const int c = is_link(x,y,mu);
       if( is_link(x,y,mu) ) {
         int xp, yp;
         const int sign = cshift( xp, yp, x, y, mu );
@@ -328,8 +332,8 @@ void multD ( Complex* res, const Complex* v ){
         Complex P[4];
         Wilson_projector( P, mu );
 
-        res[2*i] = res[2*i] + sign * 0.5 * kappa * (P[0]*v[idx2] + P[1]*v[idx2+1]);
-        res[2*i+1] = res[2*i+1] + sign * 0.5 * kappa * (P[2]*v[idx2] + P[3]*v[idx2+1]);
+        res[2*i] = res[2*i] - sign * 0.5 * kappa * (P[0]*v[idx2] + P[1]*v[idx2+1]);
+        res[2*i+1] = res[2*i+1] - sign * 0.5 * kappa * (P[2]*v[idx2] + P[3]*v[idx2+1]);
       }
     }
   }
@@ -358,8 +362,8 @@ void multDdagger ( Complex* res, const Complex* v ){
         Complex P[4];
         Wilson_projector( P, mu );
 
-        res[2*i] = res[2*i] + sign * 0.5 * kappa * (P[0]*v[idx2] + P[1]*v[idx2+1]);
-        res[2*i+1] = res[2*i+1] + sign * 0.5 * kappa * (P[2]*v[idx2] + P[3]*v[idx2+1]);
+        res[2*i] = res[2*i] - sign * 0.5 * kappa * (P[0]*v[idx2] + P[1]*v[idx2+1]);
+        res[2*i+1] = res[2*i+1] - sign * 0.5 * kappa * (P[2]*v[idx2] + P[3]*v[idx2+1]);
       }
     }
   }
