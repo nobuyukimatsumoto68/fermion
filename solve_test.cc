@@ -6,7 +6,6 @@
 #include <omp.h>
 
 #include <Eigen/Dense>
-// #include <Eigen/Eigenvalues>
 
 #include "typedefs.hpp"
 #include "constants.hpp"
@@ -30,17 +29,19 @@ int main(){
   e0( 2*idx(xx, yy) ) = 1.0;
   e0 = multDdagger_eigen(e0);
 
-  // const Vect Dinv0 = CG(init, e0);
-  // std::cout << Dinv0 << std::endl;
-  std::cout << e0 << std::endl;
+  // e0 = multD_eigen(e0);
+
+  const Vect Dinv0 = CG(init, e0);
+  std::cout << Dinv0 << std::endl;
+  // std::cout << e0 << std::endl;
 
 
   Vect e1 = Eigen::VectorXcd::Zero(2*Lx*Ly);
   e1( 2*idx(xx, yy)+1 ) = 1.0;
   e1 = multDdagger_eigen(e1);
-  // const Vect Dinv1 = CG(init, e1);
-  // std::cout << Dinv1 << std::endl;
-  std::cout << e1 << std::endl;
+  const Vect Dinv1 = CG(init, e1);
+  std::cout << Dinv1 << std::endl;
+  // std::cout << e1 << std::endl;
 
   return 0;
 }
