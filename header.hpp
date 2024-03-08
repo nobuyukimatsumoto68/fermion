@@ -61,18 +61,18 @@ int cshift(int& xp, int& yp, const int x, const int y, const int mu){
     xp=mod(x-1,Lx);
     yp=y;
 
-    if(x==0) res *= -1;
+    if(x==0 && nu>=3) res *= -1;
   }
   else if(mu==1){
     xp=mod(x+1,Lx);
     yp=mod(y-1,Ly);
 
-    if(x==Lx-1) res *= -1;
-    if(y==0) {
-      if(is_periodic_orthogonal) {
-        if(xp-Ly/2<0) res *= -1;
-        xp=mod(xp-int(Ly/2),Lx);
-      }
+    if(x==Lx-1 && nu>=3) res *= -1;
+    if(y==0 && nu/2==1) {
+      // if(is_periodic_orthogonal) {
+      //   if(xp-Ly/2<0) res *= -1;
+      //   xp=mod(xp-int(Ly/2),Lx);
+      // }
       res *= -1;
     }
   }
@@ -80,11 +80,11 @@ int cshift(int& xp, int& yp, const int x, const int y, const int mu){
     xp=x;
     yp=mod(y+1,Ly);
 
-    if(y==Ly-1) {
-      if(is_periodic_orthogonal) {
-        if(Lx<=xp+Ly/2) res *= -1;
-        xp=mod(xp+int(Ly/2),Lx);
-      }
+    if(y==Ly-1 && nu/2==1) {
+      // if(is_periodic_orthogonal) {
+      //   if(Lx<=xp+Ly/2) res *= -1;
+      //   xp=mod(xp+int(Ly/2),Lx);
+      // }
       res *= -1;
     }
   }
@@ -92,18 +92,18 @@ int cshift(int& xp, int& yp, const int x, const int y, const int mu){
     xp=mod(x+1,Lx);
     yp=y;
 
-    if(x==Lx-1) res *= -1;
+    if(x==Lx-1 && nu>=3) res *= -1;
   }
   else if(mu==4){
     xp=mod(x-1,Lx);
     yp=mod(y+1,Ly);
 
-    if(x==0) res *= -1;
-    if(y==Ly-1) {
-      if(is_periodic_orthogonal) {
-        if(Lx<=xp+Ly/2) res *= -1;
-        xp=mod(xp+int(Ly/2),Lx);
-      }
+    if(x==0 && nu>=3) res *= -1;
+    if(y==Ly-1 && nu/2==1) {
+      // if(is_periodic_orthogonal) {
+      //   if(Lx<=xp+Ly/2) res *= -1;
+      //   xp=mod(xp+int(Ly/2),Lx);
+      // }
       res *= -1;
     }
   }
@@ -111,11 +111,11 @@ int cshift(int& xp, int& yp, const int x, const int y, const int mu){
     xp=x;
     yp=mod(y-1,Ly);
 
-    if(y==0) {
-      if(is_periodic_orthogonal) {
-        if(xp-Ly/2<0) res *= -1;
-        xp=mod(xp-int(Ly/2),Lx);
-      }
+    if(y==0 && nu/2==1 ) {
+      // if(is_periodic_orthogonal) {
+      //   if(xp-Ly/2<0) res *= -1;
+      //   xp=mod(xp-int(Ly/2),Lx);
+      // }
       res *= -1;
     }
   }
@@ -132,18 +132,18 @@ int cshift_minus(int& xp, int& yp, const int x, const int y, const int mu){
     xp=mod(x+1,Lx);
     yp=y;
 
-    if(x==Lx-1) res *= -1;
+    if(x==Lx-1 && nu>=3) res *= -1;
   }
   else if(mu==1){
     xp=mod(x-1,Lx);
     yp=mod(y+1,Ly);
 
-    if(x==0) res *= -1;
-    if(y==Ly-1) {
-      if(is_periodic_orthogonal) {
-        if(Lx<=xp+Ly/2) res *= -1;
-        xp=mod(xp+int(Ly/2),Lx);
-      }
+    if(x==0 && nu>=3) res *= -1;
+    if(y==Ly-1 && nu/2==1) {
+      // if(is_periodic_orthogonal) {
+      //   if(Lx<=xp+Ly/2) res *= -1;
+      //   xp=mod(xp+int(Ly/2),Lx);
+      // }
       res *= -1;
     }
   }
@@ -151,11 +151,11 @@ int cshift_minus(int& xp, int& yp, const int x, const int y, const int mu){
     xp=x;
     yp=mod(y-1,Ly);
 
-    if(y==0) {
-      if(is_periodic_orthogonal) {
-        if(xp-Ly/2<0) res *= -1;
-        xp=mod(xp-int(Ly/2),Lx);
-      }
+    if(y==0 && nu/2==1) {
+      // if(is_periodic_orthogonal) {
+      //   if(xp-Ly/2<0) res *= -1;
+      //   xp=mod(xp-int(Ly/2),Lx);
+      // }
       res *= -1;
     }
   }
@@ -163,18 +163,18 @@ int cshift_minus(int& xp, int& yp, const int x, const int y, const int mu){
     xp=mod(x-1,Lx);
     yp=y;
 
-    if(x==0) res *= -1;
+    if(x==0 && nu>=3) res *= -1;
   }
   else if(mu==4){
     xp=mod(x+1,Lx);
     yp=mod(y-1,Ly);
 
-    if(x==Lx-1) res *= -1;
-    if(y==0) {
-      if(is_periodic_orthogonal) {
-        if(xp-Ly/2<0) res *= -1;
-        xp=mod(xp-int(Ly/2),Lx);
-      }
+    if(x==Lx-1 && nu>=3) res *= -1;
+    if(y==0 && nu/2==1) {
+      // if(is_periodic_orthogonal) {
+      //   if(xp-Ly/2<0) res *= -1;
+      //   xp=mod(xp-int(Ly/2),Lx);
+      // }
       res *= -1;
     }
   }
@@ -182,11 +182,11 @@ int cshift_minus(int& xp, int& yp, const int x, const int y, const int mu){
     xp=x;
     yp=mod(y+1,Ly);
 
-    if(y==Ly-1) {
-      if(is_periodic_orthogonal) {
-        if(Lx<=xp+Ly/2) res *= -1;
-        xp=mod(xp+int(Ly/2),Lx);
-      }
+    if(y==Ly-1 && nu/2==1) {
+      // if(is_periodic_orthogonal) {
+      //   if(Lx<=xp+Ly/2) res *= -1;
+      //   xp=mod(xp+int(Ly/2),Lx);
+      // }
       res *= -1;
     }
   }
@@ -233,9 +233,7 @@ V2 get_e( const int mu ){
 M2 Wilson_projector( const int mu ){
   V2 e = get_e(mu);
 
-  // M2 res = -e(0)*sigma[2] -e(1)*sigma[1];
   M2 res = e(0)*sigma[1] + e(1)*sigma[2];
-  // res *= sign;
   res += sigma[0];
   res *= 0.5;
   return res;
@@ -247,28 +245,18 @@ Eigen::MatrixXcd get_Dirac_matrix (){
 
   for(int x=0; x<Lx; x++){
     for(int y=0; y<Ly; y++){
-      // if( is_site(x,y) ) res.block<2,2>(2*idx(x,y), 2*idx(x,y)) = 0.5*sigma[0];
       if( is_site(x,y) ) res.block<2,2>(2*idx(x,y), 2*idx(x,y)) = sigma[0];
     }
   }
 
   for(int y=0; y<Ly; y++) for(int x=0; x<Lx; x++) {
       for(int mu=0; mu<SIX; mu++){
-        // for(int mu=0; mu<THREE; mu++){
         if( is_link(x,y,mu) ) {
           int xp, yp;
           const int sign = cshift( xp, yp, x, y, mu );
           const Idx idx1 = 2*idx(x,y);
           const Idx idx2 = 2*idx(xp,yp);
-          // res.block<2,2>(idx1, idx2) = -sign * 0.5 * kappa * Wilson_projector(mu);
-
-          // res.block<2,2>(idx1, idx2) = -sign * 2.0 * kappa * Wilson_projector(mu);
-
-
-          // res.block<2,2>(idx1, idx2) = -sign * kappa * Wilson_projector(mu);
-          res.block<2,2>(idx1, idx2) = - kappa * Wilson_projector(mu);
-
-          // res.block<2,2>(idx1, idx2) = -kappa * Wilson_projector(mu, sign);
+          res.block<2,2>(idx1, idx2) = -sign * kappa * Wilson_projector(mu);
         }
       }
     }
@@ -300,7 +288,6 @@ Eigen::VectorXcd multD_eigen ( const Eigen::VectorXcd& v ){
   for(int x=0; x<Lx; x++){
     for(int y=0; y<Ly; y++){
       const Idx idx1 = 2*idx(x,y);
-      // if( is_site(x,y) ) res.segment(idx1,2) += 0.5 * v.segment(idx1,2);
       if( is_site(x,y) ) res.segment(idx1,2) += v.segment(idx1,2);
     }
   }
@@ -309,22 +296,13 @@ Eigen::VectorXcd multD_eigen ( const Eigen::VectorXcd& v ){
 #pragma omp parallel for collapse(2)
 #endif
   for(int y=0; y<Ly; y++) for(int x=0; x<Lx; x++) {
-      //for(int mu=0; mu<SIX; mu++){
       for(int mu=0; mu<SIX; mu++){
         if( is_link(x,y,mu) ) {
           int xp, yp;
           const int sign = cshift( xp, yp, x, y, mu );
           const Idx idx1 = 2*idx(x,y);
           const Idx idx2 = 2*idx(xp,yp);
-          // res.segment(idx1, 2) -= sign * 0.5 * kappa * Wilson_projector(mu) * v.segment(idx2, 2);
-
-          // res.segment(idx1, 2) -= sign * 2.0 * kappa * Wilson_projector(mu) * v.segment(idx2, 2);
-
-
-          // res.segment(idx1, 2) -= sign * kappa * Wilson_projector(mu) * v.segment(idx2, 2);
-          res.segment(idx1, 2) -= kappa * Wilson_projector(mu) * v.segment(idx2, 2);
-
-          // res.segment(idx1, 2) -=  kappa * Wilson_projector(mu, sign) * v.segment(idx2, 2);
+          res.segment(idx1, 2) -= sign * kappa * Wilson_projector(mu) * v.segment(idx2, 2);
         }
       }
     }
@@ -342,7 +320,6 @@ Eigen::VectorXcd multDdagger_eigen ( const Eigen::VectorXcd& v){
   for(int x=0; x<Lx; x++){
     for(int y=0; y<Ly; y++){
       const Idx idx1 = 2*idx(x,y);
-      // if( is_site(x,y) ) res.segment(idx1,2) += 0.5 * v.segment(idx1,2);
       if( is_site(x,y) ) res.segment(idx1,2) += v.segment(idx1,2);
     }
   }
@@ -357,9 +334,7 @@ Eigen::VectorXcd multDdagger_eigen ( const Eigen::VectorXcd& v){
           const int sign = cshift_minus( xp, yp, x, y, mu );
           const Idx idx1 = 2*idx(x,y);
           const Idx idx2 = 2*idx(xp,yp);
-          // res.segment(idx1, 2) -= sign * 0.5 * kappa * Wilson_projector(mu) * v.segment(idx2, 2);
           res.segment(idx1, 2) -= sign * kappa * Wilson_projector(mu) * v.segment(idx2, 2);
-          // res.segment(idx1, 2) -= kappa * Wilson_projector(mu, sign) * v.segment(idx2, 2);
         }
       }
     }

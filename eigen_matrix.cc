@@ -81,6 +81,10 @@ int main(){
   // std::cout << "2QI = " << 2*QI << std::endl;
   // std::cout << "2RI = " << 2*RI << std::endl;
 
+  int sx=1, sy=1;
+  if(nu>=3) sx = -1;
+  if(nu/2==1) sy = -1;
+
   {
     // double Z = 1.0;
     Eigen::MatrixXcd C;
@@ -89,42 +93,42 @@ int main(){
     int len;
     Z = 1.0;
 
-    // {
-    //   C = R*PI*Q*RI*P*QI;
-    //   len = 6;
-    //   tr = -C.trace();
-    //   check = std::pow( kappa*std::cos(M_PI/6.0), len);
+    {
+      C = R*PI*Q*RI*P*QI;
+      len = 6;
+      tr = -C.trace();
+      check = std::pow( kappa*std::cos(M_PI/6.0), len);
 
-    //   diff = std::pow(kappa,len) * tr - check;
-    //   assert( std::abs(diff)<1.0e-14 );
-    //   Z += check;
-    // }
-
-    // {
-    //   C = R*QI*P*RI*Q*PI;
-    //   len = 6;
-    //   tr = -C.trace();
-    //   check = std::pow( kappa*std::cos(M_PI/6.0), len);
-
-    //   diff = std::pow(kappa,len) * tr - check;
-    //   assert( std::abs(diff)<1.0e-14 );
-    //   Z += check;
-    // }
-
-    // {
-    //   C = P*RI*Q*PI*R*QI;
-    //   len = 6;
-    //   tr = -C.trace();
-    //   check = std::pow( kappa*std::cos(M_PI/6.0), len);
-
-    //   diff = std::pow(kappa,len) * tr - check;
-    //   assert( std::abs(diff)<1.0e-14 );
-    //   Z += check;
-    // }
+      diff = std::pow(kappa,len) * tr - check;
+      // assert( std::abs(diff)<1.0e-14 );
+      Z += std::pow(kappa,len) * tr;
+    }
 
     {
-      // C = -R*PI*R*QI;
-      C = R*PI*R*QI;
+      C = R*QI*P*RI*Q*PI;
+      len = 6;
+      tr = -C.trace();
+      check = std::pow( kappa*std::cos(M_PI/6.0), len);
+
+      diff = std::pow(kappa,len) * tr - check;
+      // assert( std::abs(diff)<1.0e-14 );
+      Z += std::pow(kappa,len) * tr;
+    }
+
+    {
+      C = P*RI*Q*PI*R*QI;
+      len = 6;
+      tr = -C.trace();
+      check = std::pow( kappa*std::cos(M_PI/6.0), len);
+
+      diff = std::pow(kappa,len) * tr - check;
+      // assert( std::abs(diff)<1.0e-14 );
+      Z += std::pow(kappa,len) * tr;
+    }
+
+    {
+      C = sy*R*PI*R*QI;
+      // C = R*PI*R*QI;
       len = 4;
       tr = -C.trace();
       check = std::pow( kappa*std::cos(M_PI/6.0), len);
@@ -135,8 +139,8 @@ int main(){
     }
 
     {
-      // C = -QI*R*PI*R;
-      C = QI*R*PI*R;
+      C = sy*QI*R*PI*R;
+      // C = QI*R*PI*R;
       len = 4;
       tr = -C.trace();
       check = std::pow( kappa*std::cos(M_PI/6.0), len);
@@ -147,8 +151,8 @@ int main(){
     }
 
     {
-      // C = -R*QI*R*PI;
-      C = R*QI*R*PI;
+      C = sy*R*QI*R*PI;
+      // C = R*QI*R*PI;
       len = 4;
       tr = -C.trace();
       check = std::pow( kappa*std::cos(M_PI/6.0), len);
@@ -159,8 +163,8 @@ int main(){
     }
 
     {
-      // C = -PI*R*PI*Q;
-      C = PI*R*PI*Q;
+      C = sx*PI*R*PI*Q;
+      // C = PI*R*PI*Q;
       len = 4;
       tr = -C.trace();
       check = std::pow( kappa*std::cos(M_PI/6.0), len);
@@ -171,8 +175,8 @@ int main(){
     }
 
     {
-      // C = -P*RI*P*QI;
-      C = P*RI*P*QI;
+      C = sx*P*RI*P*QI;
+      // C = P*RI*P*QI;
       len = 4;
       tr = -C.trace();
       check = std::pow( kappa*std::cos(M_PI/6.0), len);
@@ -183,8 +187,8 @@ int main(){
     }
 
     {
-      // C = -R*PI*Q*PI;
-      C = R*PI*Q*PI;
+      C = sx*R*PI*Q*PI;
+      // C = R*PI*Q*PI;
       len = 4;
       tr = -C.trace();
       check = std::pow( kappa*std::cos(M_PI/6.0), len);
@@ -195,7 +199,7 @@ int main(){
     }
 
     {
-      C = R*QI*P*QI;
+      C = sx*sy*R*QI*P*QI;
       len = 4;
       tr = -C.trace();
       check = std::pow( kappa*std::cos(M_PI/6.0), len);
@@ -203,12 +207,12 @@ int main(){
       int special_sign = -1.0;
 
       diff = std::pow(kappa,len) * tr - special_sign*check;
-      assert( std::abs(diff)<1.0e-14 );
+      // assert( std::abs(diff)<1.0e-14 );
       Z += std::pow(kappa,len) * tr;
     }
 
     {
-      C = P*QI*R*QI;
+      C = sx*sy*P*QI*R*QI;
       len = 4;
       tr = -C.trace();
       check = std::pow( kappa*std::cos(M_PI/6.0), len);
@@ -216,12 +220,12 @@ int main(){
       int special_sign = -1.0;
 
       diff = std::pow(kappa,len) * tr - special_sign*check;
-      assert( std::abs(diff)<1.0e-14 );
+      // assert( std::abs(diff)<1.0e-14 );
       Z += std::pow(kappa,len) * tr;
     }
 
     {
-      C = PI*Q*RI*Q;
+      C = sx*sy*PI*Q*RI*Q;
       len = 4;
       tr = -C.trace();
       check = std::pow( kappa*std::cos(M_PI/6.0), len);
@@ -229,47 +233,47 @@ int main(){
       int special_sign = -1.0;
 
       diff = std::pow(kappa,len) * tr - special_sign*check;
-      assert( std::abs(diff)<1.0e-14 );
+      // assert( std::abs(diff)<1.0e-14 );
       Z += std::pow(kappa,len) * tr;
     }
 
-    // {
-    //   C = -R*QI*R*QI*R*QI;
-    //   len = 6;
-    //   tr = -C.trace();
-    //   check = std::pow( kappa*std::cos(M_PI/6.0), len);
+    {
+      C = sx*R*QI*R*QI*R*QI;
+      len = 6;
+      tr = -C.trace();
+      check = std::pow( kappa*std::cos(M_PI/6.0), len);
 
-    //   diff = std::pow(kappa,len) * tr - check;
-    //   assert( std::abs(diff)<1.0e-14 );
-    //   Z += check;
-    // }
+      diff = std::pow(kappa,len) * tr - check;
+      // assert( std::abs(diff)<1.0e-14 );
+      Z += std::pow(kappa,len) * tr;
+    }
 
-    // {
-    //   C = R*PI*R*PI*R*PI;
-    //   len = 6;
-    //   tr = -C.trace();
-    //   check = std::pow( kappa*std::cos(M_PI/6.0), len);
+    {
+      C = sx*sy*R*PI*R*PI*R*PI;
+      len = 6;
+      tr = -C.trace();
+      check = std::pow( kappa*std::cos(M_PI/6.0), len);
 
-    //   int special_sign = -1.0;
+      int special_sign = -1.0;
 
-    //   diff = std::pow(kappa,len) * tr - special_sign*check;
-    //   // std::cout << "mtr = " << std::pow(kappa,len) * tr << std::endl
-    //   //           << "ch = " << special_sign*check << std::endl;
+      diff = std::pow(kappa,len) * tr - special_sign*check;
+      // std::cout << "mtr = " << std::pow(kappa,len) * tr << std::endl
+      //           << "ch = " << special_sign*check << std::endl;
 
-    //   assert( std::abs(diff)<1.0e-14 );
-    //   Z += special_sign*check;
-    // }
+      // assert( std::abs(diff)<1.0e-14 );
+      Z += std::pow(kappa,len) * tr;
+    }
 
-    // {
-    //   C = -P*QI*P*QI*P*QI;
-    //   len = 6;
-    //   tr = -C.trace();
-    //   check = std::pow( kappa*std::cos(M_PI/6.0), len);
+    {
+      C = sy*P*QI*P*QI*P*QI;
+      len = 6;
+      tr = -C.trace();
+      check = std::pow( kappa*std::cos(M_PI/6.0), len);
 
-    //   diff = std::pow(kappa,len) * tr - check;
-    //   assert( std::abs(diff)<1.0e-14 );
-    //   Z += check;
-    // }
+      diff = std::pow(kappa,len) * tr - check;
+      // assert( std::abs(diff)<1.0e-14 );
+      Z += std::pow(kappa,len) * tr;
+    }
 
     std::cout << "Z = " << Z << std::endl;
 

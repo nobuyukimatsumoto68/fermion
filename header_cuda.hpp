@@ -119,18 +119,18 @@ int cshift(int& xp, int& yp, const int x, const int y, const int mu){
     xp=mod(x-1,Lx);
     yp=y;
 
-    if(x==0) res *= -1;
+    if(x==0 && nu>=3) res *= -1;
   }
   else if(mu==1){
     xp=mod(x+1,Lx);
     yp=mod(y-1,Ly);
 
-    if(x==Lx-1) res *= -1;
-    if(y==0) {
-      if(is_periodic_orthogonal) {
-        if(xp-Ly/2<0) res *= -1;
-        xp=mod(xp-int(Ly/2),Lx);
-      }
+    if(x==Lx-1 && nu>=3) res *= -1;
+    if(y==0 && nu/2==1) {
+      // if(is_periodic_orthogonal) {
+      //   if(xp-Ly/2<0) res *= -1;
+      //   xp=mod(xp-int(Ly/2),Lx);
+      // }
       res *= -1;
     }
   }
@@ -138,11 +138,11 @@ int cshift(int& xp, int& yp, const int x, const int y, const int mu){
     xp=x;
     yp=mod(y+1,Ly);
 
-    if(y==Ly-1) {
-      if(is_periodic_orthogonal) {
-        if(Lx<=xp+Ly/2) res *= -1;
-        xp=mod(xp+int(Ly/2),Lx);
-      }
+    if(y==Ly-1 && nu/2==1) {
+      // if(is_periodic_orthogonal) {
+      //   if(Lx<=xp+Ly/2) res *= -1;
+      //   xp=mod(xp+int(Ly/2),Lx);
+      // }
       res *= -1;
     }
   }
@@ -150,18 +150,18 @@ int cshift(int& xp, int& yp, const int x, const int y, const int mu){
     xp=mod(x+1,Lx);
     yp=y;
 
-    if(x==Lx-1) res *= -1;
+    if(x==Lx-1 && nu>=3) res *= -1;
   }
   else if(mu==4){
     xp=mod(x-1,Lx);
     yp=mod(y+1,Ly);
 
-    if(x==0) res *= -1;
-    if(y==Ly-1) {
-      if(is_periodic_orthogonal) {
-        if(Lx<=xp+Ly/2) res *= -1;
-        xp=mod(xp+int(Ly/2),Lx);
-      }
+    if(x==0 && nu>=3) res *= -1;
+    if(y==Ly-1 && nu/2==1) {
+      // if(is_periodic_orthogonal) {
+      //   if(Lx<=xp+Ly/2) res *= -1;
+      //   xp=mod(xp+int(Ly/2),Lx);
+      // }
       res *= -1;
     }
   }
@@ -169,16 +169,15 @@ int cshift(int& xp, int& yp, const int x, const int y, const int mu){
     xp=x;
     yp=mod(y-1,Ly);
 
-    if(y==0) {
-      if(is_periodic_orthogonal) {
-        if(xp-Ly/2<0) res *= -1;
-        xp=mod(xp-int(Ly/2),Lx);
-      }
+    if(y==0 && nu/2==1 ) {
+      // if(is_periodic_orthogonal) {
+      //   if(xp-Ly/2<0) res *= -1;
+      //   xp=mod(xp-int(Ly/2),Lx);
+      // }
       res *= -1;
     }
   }
   else assert(false);
-
   return res;
 }
 
@@ -191,14 +190,14 @@ int cshift_minus(int& xp, int& yp, const int x, const int y, const int mu){
     xp=mod(x+1,Lx);
     yp=y;
 
-    if(x==Lx-1) res *= -1;
+    if(x==Lx-1 && nu>=3) res *= -1;
   }
   else if(mu==1){
     xp=mod(x-1,Lx);
     yp=mod(y+1,Ly);
 
-    if(x==0) res *= -1;
-    if(y==Ly-1) {
+    if(x==0 && nu>=3) res *= -1;
+    if(y==Ly-1 && nu/2==1) {
       // if(is_periodic_orthogonal) {
       //   if(Lx<=xp+Ly/2) res *= -1;
       //   xp=mod(xp+int(Ly/2),Lx);
@@ -210,7 +209,7 @@ int cshift_minus(int& xp, int& yp, const int x, const int y, const int mu){
     xp=x;
     yp=mod(y-1,Ly);
 
-    if(y==0) {
+    if(y==0 && nu/2==1) {
       // if(is_periodic_orthogonal) {
       //   if(xp-Ly/2<0) res *= -1;
       //   xp=mod(xp-int(Ly/2),Lx);
@@ -222,14 +221,14 @@ int cshift_minus(int& xp, int& yp, const int x, const int y, const int mu){
     xp=mod(x-1,Lx);
     yp=y;
 
-    if(x==0) res *= -1;
+    if(x==0 && nu>=3) res *= -1;
   }
   else if(mu==4){
     xp=mod(x+1,Lx);
     yp=mod(y-1,Ly);
 
-    if(x==Lx-1) res *= -1;
-    if(y==0) {
+    if(x==Lx-1 && nu>=3) res *= -1;
+    if(y==0 && nu/2==1) {
       // if(is_periodic_orthogonal) {
       //   if(xp-Ly/2<0) res *= -1;
       //   xp=mod(xp-int(Ly/2),Lx);
@@ -241,7 +240,7 @@ int cshift_minus(int& xp, int& yp, const int x, const int y, const int mu){
     xp=x;
     yp=mod(y+1,Ly);
 
-    if(y==Ly-1) {
+    if(y==Ly-1 && nu/2==1) {
       // if(is_periodic_orthogonal) {
       //   if(Lx<=xp+Ly/2) res *= -1;
       //   xp=mod(xp+int(Ly/2),Lx);
@@ -295,17 +294,17 @@ void daxpy(Complex* d_res, Complex* d_a, Complex* d_x, Complex* d_y){
 
 
 __device__
-void Wilson_projector( Complex* res, const int mu, const int sign = +1 ){
+void Wilson_projector( Complex* res, const int mu){
   double e[2];
   get_e(e, mu);
 
   res[0] = cplx(0.5);
   res[3] = cplx(0.5);
 
-  res[1] = - sign * 0.5 * ( e[0]-cuI*e[1] );
-  res[2] = - sign * 0.5 * ( e[0]+cuI*e[1] );
-  // res[1] = 0.5 * ( e[0]-cuI*e[1] );
-  // res[2] = 0.5 * ( e[0]+cuI*e[1] );
+  // res[1] = - sign * 0.5 * ( e[0]-cuI*e[1] );
+  // res[2] = - sign * 0.5 * ( e[0]+cuI*e[1] );
+  res[1] = 0.5 * ( e[0]-cuI*e[1] );
+  res[2] = 0.5 * ( e[0]+cuI*e[1] );
 }
 
 
@@ -318,12 +317,11 @@ void multD ( Complex* res, const Complex* v ){
     get_xy(x,y,i);
 
     if( is_site(x,y) ){
-      res[2*i] = res[2*i] + 0.5*v[2*i];
-      res[2*i+1] = res[2*i+1] + 0.5*v[2*i+1];
+      res[2*i] = res[2*i] + v[2*i];
+      res[2*i+1] = res[2*i+1] + v[2*i+1];
     }
 
     for(int mu=0; mu<SIX; mu++){
-      // const int c = is_link(x,y,mu);
       if( is_link(x,y,mu) ) {
         int xp, yp;
         const int sign = cshift( xp, yp, x, y, mu );
@@ -332,8 +330,8 @@ void multD ( Complex* res, const Complex* v ){
         Complex P[4];
         Wilson_projector( P, mu );
 
-        res[2*i] = res[2*i] - sign * 0.5 * kappa * (P[0]*v[idx2] + P[1]*v[idx2+1]);
-        res[2*i+1] = res[2*i+1] - sign * 0.5 * kappa * (P[2]*v[idx2] + P[3]*v[idx2+1]);
+        res[2*i] = res[2*i] - sign * kappa * (P[0]*v[idx2] + P[1]*v[idx2+1]);
+        res[2*i+1] = res[2*i+1] - sign * kappa * (P[2]*v[idx2] + P[3]*v[idx2+1]);
       }
     }
   }
@@ -349,8 +347,8 @@ void multDdagger ( Complex* res, const Complex* v ){
     get_xy(x,y,i);
 
     if( is_site(x,y) ){
-      res[2*i] = res[2*i] + 0.5*v[2*i];
-      res[2*i+1] = res[2*i+1] + 0.5*v[2*i+1];
+      res[2*i] = res[2*i] + v[2*i];
+      res[2*i+1] = res[2*i+1] + v[2*i+1];
     }
 
     for(int mu=0; mu<SIX; mu++){
@@ -362,8 +360,8 @@ void multDdagger ( Complex* res, const Complex* v ){
         Complex P[4];
         Wilson_projector( P, mu );
 
-        res[2*i] = res[2*i] - sign * 0.5 * kappa * (P[0]*v[idx2] + P[1]*v[idx2+1]);
-        res[2*i+1] = res[2*i+1] - sign * 0.5 * kappa * (P[2]*v[idx2] + P[3]*v[idx2+1]);
+        res[2*i] = res[2*i] - sign * kappa * (P[0]*v[idx2] + P[1]*v[idx2+1]);
+        res[2*i+1] = res[2*i+1] - sign * kappa * (P[2]*v[idx2] + P[3]*v[idx2+1]);
       }
     }
   }
