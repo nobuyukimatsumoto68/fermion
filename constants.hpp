@@ -12,21 +12,21 @@ const int TWO = 2;
 const int THREE = 3;
 const int SIX = 6;
 
-const int nu = 4;
+const int nu = 3;
 
 const double m = 0.0;
 // const int Lx = 3 * 1;
 // const int Ly = 3 * 1;
 // const int Lx = 6 * 4;
 // const int Ly = 6 * 4;
-const int Lx = 6 * 6;
-const int Ly = 6 * 6;
+// const int Lx = 6 * 6;
+// const int Ly = 6 * 6;
 
 // const int Lx = 6 * 64;
 // const int Ly = 6 * 64;
 
-// const int Lx = 6 * 128;
-// const int Ly = 6 * 128;
+const int Lx = 6 * 128;
+const int Ly = 6 * 128;
 
 // const int Lx = 6 * 256;
 // const int Ly = 6 * 256;
