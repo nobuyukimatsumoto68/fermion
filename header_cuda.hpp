@@ -303,8 +303,8 @@ void Wilson_projector( Complex* res, const int mu){
 
   // res[1] = - sign * 0.5 * ( e[0]-cuI*e[1] );
   // res[2] = - sign * 0.5 * ( e[0]+cuI*e[1] );
-  res[1] = 0.5 * ( e[0]-cuI*e[1] );
-  res[2] = 0.5 * ( e[0]+cuI*e[1] );
+  res[1] = -0.5 * ( e[0]-cuI*e[1] );
+  res[2] = -0.5 * ( e[0]+cuI*e[1] );
 }
 
 

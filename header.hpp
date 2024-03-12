@@ -233,7 +233,7 @@ V2 get_e( const int mu ){
 M2 Wilson_projector( const int mu ){
   V2 e = get_e(mu);
 
-  M2 res = e(0)*sigma[1] + e(1)*sigma[2];
+  M2 res = -e(0)*sigma[1] - e(1)*sigma[2];
   res += sigma[0];
   res *= 0.5;
   return res;
