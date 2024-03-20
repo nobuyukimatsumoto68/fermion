@@ -30,7 +30,6 @@ int main(){
   e0 = multDdagger_eigen(e0);
 
   // e0 = multD_eigen(e0);
-
   const Vect Dinv0 = CG(init, e0);
   std::cout << Dinv0 << std::endl;
   // std::cout << e0 << std::endl;

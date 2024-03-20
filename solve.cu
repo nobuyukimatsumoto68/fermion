@@ -29,65 +29,209 @@ int main(){
 
   // -----
 
-  const int xx = 0, yy = 0;
-
   Complex *e, *Dinv;
   e = (Complex*)malloc(N*CD);
   Dinv = (Complex*)malloc(N*CD);
 
-  set2zero(e, N);
-  e[ 2*idx(xx, yy) ] = cplx(1.0);
-  multDdagger_wrapper( e, e );
-  // multD_wrapper( e, e );
-
-  set2zero(Dinv, N);
-  solve(Dinv, e);
-
-  // for(Idx i=0; i<N; i++){
-  //   std::cout << real(Dinv[i]) << " " << imag(Dinv[i]) << std::endl;
-  //   // std::cout << real(e[i]) << " " << imag(e[i]) << std::endl;
-  // }
-
   {
-    std::ofstream of( dir_data+description+"Dinv0_cuda.dat",
-                      std::ios::out | std::ios::binary | std::ios::trunc);
-    if(!of) assert(false);
+    int xx = 0, yy = 0;
 
-    double tmp = 0.0;
-    for(Idx i=0; i<N; i++){
-      tmp = real(Dinv[i]);
-      of.write((char*) &tmp, sizeof(double) );
+    set2zero(e, N);
+    e[ 2*idx(xx, yy) ] = cplx(1.0);
+    multDdagger_wrapper( e, e );
 
-      tmp = imag(Dinv[i]);
-      of.write((char*) &tmp, sizeof(double) );
+    set2zero(Dinv, N);
+    solve(Dinv, e);
+
+    {
+      std::ofstream of( dir_data+description+"Dinv_0_0_0_cuda.dat",
+                        std::ios::out | std::ios::binary | std::ios::trunc);
+      if(!of) assert(false);
+
+      double tmp = 0.0;
+      for(Idx i=0; i<N; i++){
+        tmp = real(Dinv[i]);
+        of.write((char*) &tmp, sizeof(double) );
+
+        tmp = imag(Dinv[i]);
+        of.write((char*) &tmp, sizeof(double) );
+      }
+    }
+
+    set2zero(e, N);
+    e[ 2*idx(xx, yy)+1] = cplx(1.0);
+    multDdagger_wrapper( e, e );
+
+    set2zero(Dinv, N);
+    solve(Dinv, e);
+
+    {
+      std::ofstream of( dir_data+description+"Dinv_0_0_1_cuda.dat",
+                        std::ios::out | std::ios::binary | std::ios::trunc);
+      if(!of) assert(false);
+
+      double tmp = 0.0;
+      for(Idx i=0; i<N; i++){
+        tmp = real(Dinv[i]);
+        of.write((char*) &tmp, sizeof(double) );
+
+        tmp = imag(Dinv[i]);
+        of.write((char*) &tmp, sizeof(double) );
+      }
     }
   }
 
-  set2zero(e, N);
-  e[ 2*idx(xx, yy)+1] = cplx(1.0);
-  multDdagger_wrapper( e, e );
-
-  set2zero(Dinv, N);
-  solve(Dinv, e);
-
-  // for(Idx i=0; i<N; i++){
-  //   std::cout << real(Dinv[i]) << " " << imag(Dinv[i]) << std::endl;
-  // }
+  //------------------------------------------
 
   {
-    std::ofstream of( dir_data+description+"Dinv1_cuda.dat",
-                      std::ios::out | std::ios::binary | std::ios::trunc);
-    if(!of) assert(false);
+    int xx = -1, yy = 0;
 
-    double tmp = 0.0;
-    for(Idx i=0; i<N; i++){
-      tmp = real(Dinv[i]);
-      of.write((char*) &tmp, sizeof(double) );
+    set2zero(e, N);
+    e[ 2*idx(xx, yy) ] = cplx(1.0);
+    multDdagger_wrapper( e, e );
 
-      tmp = imag(Dinv[i]);
-      of.write((char*) &tmp, sizeof(double) );
+    set2zero(Dinv, N);
+    solve(Dinv, e);
+
+    {
+      std::ofstream of( dir_data+description+"Dinv_m1_0_0_cuda.dat",
+                        std::ios::out | std::ios::binary | std::ios::trunc);
+      if(!of) assert(false);
+
+      double tmp = 0.0;
+      for(Idx i=0; i<N; i++){
+        tmp = real(Dinv[i]);
+        of.write((char*) &tmp, sizeof(double) );
+
+        tmp = imag(Dinv[i]);
+        of.write((char*) &tmp, sizeof(double) );
+      }
+    }
+
+    set2zero(e, N);
+    e[ 2*idx(xx, yy)+1] = cplx(1.0);
+    multDdagger_wrapper( e, e );
+
+    set2zero(Dinv, N);
+    solve(Dinv, e);
+
+    {
+      std::ofstream of( dir_data+description+"Dinv_m1_0_1_cuda.dat",
+                        std::ios::out | std::ios::binary | std::ios::trunc);
+      if(!of) assert(false);
+
+      double tmp = 0.0;
+      for(Idx i=0; i<N; i++){
+        tmp = real(Dinv[i]);
+        of.write((char*) &tmp, sizeof(double) );
+
+        tmp = imag(Dinv[i]);
+        of.write((char*) &tmp, sizeof(double) );
+      }
     }
   }
+
+  //------------------------------------------
+
+  {
+    int xx = 1, yy = -1;
+
+    set2zero(e, N);
+    e[ 2*idx(xx, yy) ] = cplx(1.0);
+    multDdagger_wrapper( e, e );
+
+    set2zero(Dinv, N);
+    solve(Dinv, e);
+
+    {
+      std::ofstream of( dir_data+description+"Dinv_1_m1_0_cuda.dat",
+                        std::ios::out | std::ios::binary | std::ios::trunc);
+      if(!of) assert(false);
+
+      double tmp = 0.0;
+      for(Idx i=0; i<N; i++){
+        tmp = real(Dinv[i]);
+        of.write((char*) &tmp, sizeof(double) );
+
+        tmp = imag(Dinv[i]);
+        of.write((char*) &tmp, sizeof(double) );
+      }
+    }
+
+    set2zero(e, N);
+    e[ 2*idx(xx, yy)+1] = cplx(1.0);
+    multDdagger_wrapper( e, e );
+
+    set2zero(Dinv, N);
+    solve(Dinv, e);
+
+    {
+      std::ofstream of( dir_data+description+"Dinv_1_m1_1_cuda.dat",
+                        std::ios::out | std::ios::binary | std::ios::trunc);
+      if(!of) assert(false);
+
+      double tmp = 0.0;
+      for(Idx i=0; i<N; i++){
+        tmp = real(Dinv[i]);
+        of.write((char*) &tmp, sizeof(double) );
+
+        tmp = imag(Dinv[i]);
+        of.write((char*) &tmp, sizeof(double) );
+      }
+    }
+  }
+
+  //------------------------------------------
+
+  {
+    int xx = 0, yy = 1;
+
+    set2zero(e, N);
+    e[ 2*idx(xx, yy) ] = cplx(1.0);
+    multDdagger_wrapper( e, e );
+
+    set2zero(Dinv, N);
+    solve(Dinv, e);
+
+    {
+      std::ofstream of( dir_data+description+"Dinv_0_1_0_cuda.dat",
+                        std::ios::out | std::ios::binary | std::ios::trunc);
+      if(!of) assert(false);
+
+      double tmp = 0.0;
+      for(Idx i=0; i<N; i++){
+        tmp = real(Dinv[i]);
+        of.write((char*) &tmp, sizeof(double) );
+
+        tmp = imag(Dinv[i]);
+        of.write((char*) &tmp, sizeof(double) );
+      }
+    }
+
+    set2zero(e, N);
+    e[ 2*idx(xx, yy)+1] = cplx(1.0);
+    multDdagger_wrapper( e, e );
+
+    set2zero(Dinv, N);
+    solve(Dinv, e);
+
+    {
+      std::ofstream of( dir_data+description+"Dinv_0_1_1_cuda.dat",
+                        std::ios::out | std::ios::binary | std::ios::trunc);
+      if(!of) assert(false);
+
+      double tmp = 0.0;
+      for(Idx i=0; i<N; i++){
+        tmp = real(Dinv[i]);
+        of.write((char*) &tmp, sizeof(double) );
+
+        tmp = imag(Dinv[i]);
+        of.write((char*) &tmp, sizeof(double) );
+      }
+    }
+  }
+
+  //
 
   free( e );
   free( Dinv );

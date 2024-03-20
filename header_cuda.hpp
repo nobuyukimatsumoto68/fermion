@@ -76,7 +76,11 @@ void set_zero(Complex* d_v){
 
 
 __host__ __device__
-Idx idx(const int x, const int y){ return x + Lx*y; }
+int mod(const int a, const int b){ return (b +(a%b))%b; }
+
+
+__host__ __device__
+Idx idx(const int x, const int y){ return (x+Lx)%Lx + Lx * ((y+Ly)%Ly); }
 
 
 __host__ __device__
@@ -86,9 +90,6 @@ void get_xy(int& x, int& y, const Idx i){
   assert( i == idx(x,y) );
 }
 
-
-__host__ __device__
-int mod(const int a, const int b){ return (b +(a%b))%b; }
 
 
 __host__ __device__
@@ -475,7 +476,7 @@ void dot2self_normalized_wrapper(double& scalar, Complex* d_scalar, Complex* d_p
 
 
 __host__
-void solve(Complex x[N], Complex b[N], const double tol=1.0e-15, const int maxiter=1e5){
+void solve(Complex x[N], Complex b[N], const double tol=1.0e-15, const int maxiter=1e8){
   Complex *d_x, *d_r, *d_p, *d_q, *d_tmp;
   cudacheck(cudaMalloc(&d_x, N*CD));
   cudacheck(cudaMalloc(&d_r, N*CD));
