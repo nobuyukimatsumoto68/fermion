@@ -15,35 +15,40 @@ const int SIX = 6;
 const int nu = 3;
 
 const double m = 0.0;
-// const int Lx = 3 * 1;
-// const int Ly = 3 * 1;
+// const unsigned long Lx = 3 * 1;
+// const unsigned long Ly = 3 * 1;
 
-const int Lx = 6 * 2;
-const int Ly = 6 * 2;
+// const unsigned long Lx = 6 * 2;
+// const unsigned long Ly = 6 * 2;
 
-// const int Lx = 6 * 6;
-// const int Ly = 6 * 6;
+// const unsigned long Lx = 6 * 6;
+// const unsigned long Ly = 6 * 6;
 
-// const int Lx = 6 * 32;
-// const int Ly = 6 * 32;
 
-// const int Lx = 6 * 64;
-// const int Ly = 6 * 64;
+const unsigned long Lx = 6 * 12; // 24
+const unsigned long Ly = Lx;
 
-// const int Lx = 6 * 128;
-// const int Ly = 6 * 128;
 
-// const int Lx = 6 * 256;
-// const int Ly = 6 * 256;
+// const unsigned long Lx = 6 * 32;
+// const unsigned long Ly = 6 * 32;
 
-// const int Lx = 6 * 512;
-// const int Ly = 6 * 512;
-// const int Lx = 6 * 1024;
-// const int Ly = 6 * 1024;
+// const unsigned long Lx = 6 * 64;
+// const unsigned long Ly = 6 * 64;
+
+// const unsigned long Lx = 6 * 128;
+// const unsigned long Ly = 6 * 128;
+
+// const unsigned long Lx = 6 * 256;
+// const unsigned long Ly = 6 * 256;
+
+// const unsigned long Lx = 6 * 512;
+// const unsigned long Ly = 6 * 512;
+// const unsigned long Lx = 6 * 1024;
+// const unsigned long Ly = 6 * 1024;
 
 // const double m = 2.0;
-// const int Lx = 6 * 512;
-// const int Ly = 6 * 1024;
+// const unsigned long Lx = 6 * 512;
+// const unsigned long Ly = 6 * 1024;
 
 const double alat = 0.01; // ell
 const int nparallel = 1;
