@@ -3,7 +3,7 @@ CXXFLAGS = -O3 -std=c++17 -fopenmp # -openmp
 INCLUDES = -I/projectnb/qfe/nmatsumo/opt/eigen/
 
 NVCC = nvcc
-NVCCFLAGS = -arch=sm_70 -O3 -lcusolver
+NVCCFLAGS = -arch=sm_70 -O3 -lcusolver -std=c++17
 INCLUDES_CUDA =
 
 
@@ -14,10 +14,8 @@ all: eig.o eigen_matrix.o
 eig.o: eig.cu header_cuda.hpp typedefs_cuda.hpp constants.hpp
 	$(NVCC) $< $(NVCCFLAGS) $(INCLUDES_CUDA) -o $(DIR)$@
 
-
 eigen_matrix.o: eigen_matrix.cc header.hpp typedefs.hpp constants.hpp
 	$(CXX) $< $(CXXFLAGS) $(INCLUDES) -o $(DIR)$@
-
 
 # # all: solve.o solve.o eps.o tt.o
 

@@ -12,11 +12,33 @@ const int TWO = 2;
 const int THREE = 3;
 const int SIX = 6;
 
-const int nu = 3;
+const int nu = 1; // 1,2,3,4 // PA, PP, AA, AP // xy
+// PP, PA, AA, AP
 
 const double m = 0.0;
+
 // const unsigned long Lx = 3 * 1;
 // const unsigned long Ly = 3 * 1;
+
+// -------------------
+
+// const unsigned long Lx = 6 * 1;
+// const unsigned long Ly = 6 * 2;
+
+// const unsigned long Lx = 6 * 2;
+// const unsigned long Ly = 6 * 4;
+
+// const unsigned long Lx = 6 * 4;
+// const unsigned long Ly = 6 * 8;
+
+// const unsigned long Lx = 6 * 6;
+// const unsigned long Ly = 6 * 12;
+
+const unsigned long Lx = 6 * 8;
+const unsigned long Ly = 6 * 16;
+
+// -------------------
+
 
 // const unsigned long Lx = 6 * 2;
 // const unsigned long Ly = 6 * 2;
@@ -25,8 +47,10 @@ const double m = 0.0;
 // const unsigned long Ly = 6 * 6;
 
 
-const unsigned long Lx = 6 * 12; // 24
-const unsigned long Ly = Lx;
+
+
+// const unsigned long Lx = 6 * 20; // 20
+// const unsigned long Ly = Lx;
 
 
 // const unsigned long Lx = 6 * 32;

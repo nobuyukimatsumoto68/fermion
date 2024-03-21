@@ -15,8 +15,22 @@
 // using Idx = size_t;
 
 
-int main(){
+int compare (const void * a, const void * b)
+{
+  return ( *(Idx*)a - *(Idx*)b );
+}
+
+int main(int argc, char **argv){
   std::cout << std::scientific << std::setprecision(15) << std::endl;
+
+  int nu=3;
+
+  if (argc>1){
+    for (int i = 0; i < argc; i++) {
+      nu = atoi(argv[1]);
+      printf("%s\n", argv[i]);
+    }
+  }
 
   int device;
   cudacheck(cudaGetDeviceCount(&device));
@@ -41,15 +55,16 @@ int main(){
 
     // =====
 
+    std::cout << "-- memory alloc" << std::endl;
     D = (Complex*)malloc(N2*CD);
     set2zero(D, N*N);
-
     e = (Complex*)malloc(N*CD);
 
+    std::cout << "-- setting" << std::endl;
     for(Idx i=0; i<N; i++){
       set2zero(e, N);
       e[i] = cplx(1.0);
-      multD_wrapper( D+i*N, e ); // column major
+      multD_wrapper( D+i*N, e, nu ); // column major
     }
 
     free( e );
@@ -60,24 +75,30 @@ int main(){
     set2zero(D_removed, Neff*Neff);
 
     {
-      std::vector<Idx> vacant;
+      // std::vector<Idx> vacant;
       // Idx vacant[N/3];
+      Idx *vacant;
+
+      vacant = (Idx*)malloc(N/3*sizeof(Idx));
+      set2zero(vacant, N/3);
 
       Idx ii=0;
       for(Idx x=0; x<Lx; x++){
         for(Idx y=0; y<Ly; y++){
           const Idx idx1 = 2*idx(x,y);
           if( !is_site(x,y) ) {
-            vacant.push_back( idx1 );
-            vacant.push_back( idx1+1 );
-            // vacant[ii]=idx1;
-            // ii++;
-            // vacant[ii]=idx1+1;
-            // ii++;
+            // vacant.push_back( idx1 );
+            // vacant.push_back( idx1+1 );
+            vacant[ii]=idx1;
+            ii++;
+            vacant[ii]=idx1+1;
+            ii++;
           }
         }}
-      std::sort(vacant.begin(),vacant.end());
+      // std::sort(vacant.begin(),vacant.end());
       // std::sort(std::begin(vacant), std::end(vacant));
+      std::cout << "sorting..." << std::endl;
+      qsort( vacant, N/3, sizeof(Idx), compare );
 
       Idx idx_tot = 0;
 
@@ -97,6 +118,8 @@ int main(){
           D_removed[idx_tot] = D[i*N+j];
           idx_tot++;
         }}
+
+      free( vacant );
     }
 
     free( D );
@@ -187,12 +210,17 @@ int main(){
       exit(1);
     }
 
-    double log_det = 0.0;
+    double log_abs_det = 0.0;
+    // std::complex<double> det = 1.0;
     for(Idx i=0; i<Neff; i++) {
-      assert( imag(LU[i*Neff+i])<1.0e-14 );
-      log_det += std::log( real(LU[i*Neff+i]) );
+      // assert( imag(LU[i*Neff+i])<1.0e-14 );
+      // log_det += std::log( real(LU[i*Neff+i]) );
+      std::complex<double> tmp = real(LU[i*Neff+i]) + std::complex<double>(0.0,1.0)*imag(LU[i*Neff+i]);
+      log_abs_det += std::log( abs(tmp) );
     }
-    std::cout << "log det = " << log_det << std::endl;
+    std::cout << "nu = " << nu << std::endl
+      //<< "log det = " << log_det << std::endl;
+              << "log_abs_det = " << log_abs_det << std::endl;
 
 
     // ===========================================
