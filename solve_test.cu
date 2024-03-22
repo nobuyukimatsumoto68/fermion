@@ -39,24 +39,24 @@ int main(){
   e[ 2*idx(xx, yy) ] = cplx(1.0);
   multDdagger_wrapper( e, e );
 
-  // set2zero(Dinv, N);
-  // solve(Dinv, e);
+  set2zero(Dinv, N);
+  solve(Dinv, e);
 
   for(Idx i=0; i<N; i++){
-    // std::cout << real(Dinv[i]) << " " << imag(Dinv[i]) << std::endl;
-    std::cout << real(e[i]) << " " << imag(e[i]) << std::endl;
+    std::cout << real(Dinv[i]) << " " << imag(Dinv[i]) << std::endl;
+    // std::cout << real(e[i]) << " " << imag(e[i]) << std::endl;
   }
 
   set2zero(e, N);
   e[ 2*idx(xx, yy)+1] = cplx(1.0);
   multDdagger_wrapper( e, e );
 
-  // set2zero(Dinv, N);
-  // solve(Dinv, e);
+  set2zero(Dinv, N);
+  solve(Dinv, e);
 
   for(Idx i=0; i<N; i++){
-    // std::cout << real(Dinv[i]) << " " << imag(Dinv[i]) << std::endl;
-    std::cout << real(e[i]) << " " << imag(e[i]) << std::endl;
+    std::cout << real(Dinv[i]) << " " << imag(Dinv[i]) << std::endl;
+    // std::cout << real(e[i]) << " " << imag(e[i]) << std::endl;
   }
 
   free( e );
