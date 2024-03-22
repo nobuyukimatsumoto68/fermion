@@ -24,89 +24,188 @@ int main(){
   omp_set_num_threads( nparallel );
 #endif
 
-  Vect Dinv0(2*Lx*Ly);
-  Vect Dinv1(2*Lx*Ly);
-
-  Vect Dinv0_cuda(2*Lx*Ly);
-  Vect Dinv1_cuda(2*Lx*Ly);
-
-  // {
-  //   std::ifstream ifs( dir_data+description_old+"Dinv0.dat",
-  //                      std::ios::in | std::ios::binary );
-  //   if(!ifs) assert(false);
-
-  //   double real, imag;
-  //   for(Idx i=0; i<2*Lx*Ly; ++i){
-  //     ifs.read((char*) &real, sizeof(double) );
-  //     ifs.read((char*) &imag, sizeof(double) );
-  //     Dinv0[i] = real + I*imag;
-  //   }
-  // }
-
-
-  // {
-  //   std::ifstream ifs( dir_data+description_old+"Dinv1.dat",
-  //                      std::ios::in | std::ios::binary );
-  //   if(!ifs) assert(false);
-
-  //   double real, imag;
-  //   for(Idx i=0; i<2*Lx*Ly; ++i){
-  //     ifs.read((char*) &real, sizeof(double) );
-  //     ifs.read((char*) &imag, sizeof(double) );
-  //     Dinv1[i] = real + I*imag;
-  //   }
-  // }
+  std::vector<M2> Dinv_n_0(Lx*Ly), Dinv_n_A(Lx*Ly), Dinv_n_B(Lx*Ly), Dinv_n_C(Lx*Ly);
 
   {
-    std::ifstream ifs( dir_data+description+"Dinv0_cuda.dat",
-                       std::ios::in | std::ios::binary );
-    if(!ifs) assert(false);
+    Vect Dinv0(2*Lx*Ly);
+    Vect Dinv1(2*Lx*Ly);
 
-    double real, imag;
-    for(Idx i=0; i<2*Lx*Ly; ++i){
-      ifs.read((char*) &real, sizeof(double) );
-      ifs.read((char*) &imag, sizeof(double) );
-      Dinv0_cuda[i] = real + I*imag;
+    {
+      std::ifstream ifs( dir_data+description+"Dinv_0_0_0_cuda.dat",
+                         std::ios::in | std::ios::binary );
+      if(!ifs) assert(false);
+
+      double real, imag;
+      for(Idx i=0; i<2*Lx*Ly; ++i){
+        ifs.read((char*) &real, sizeof(double) );
+        ifs.read((char*) &imag, sizeof(double) );
+        Dinv0[i] = real + I*imag;
+      }
+    }
+
+
+    {
+      std::ifstream ifs( dir_data+description+"Dinv_0_0_1_cuda.dat",
+                         // std::ifstream ifs( dir_data+description+"Dinv1_cuda.dat",
+                         std::ios::in | std::ios::binary );
+      if(!ifs) assert(false);
+
+      double real, imag;
+      for(Idx i=0; i<2*Lx*Ly; ++i){
+        ifs.read((char*) &real, sizeof(double) );
+        ifs.read((char*) &imag, sizeof(double) );
+        Dinv1[i] = real + I*imag;
+      }
+    }
+
+
+    for(int x=0; x<Lx; x++){
+      for(int y=0; y<Ly; y++){
+        Dinv_n_0[idx(x,y)] <<
+          Dinv0( 2*idx(x,y) ), Dinv1( 2*idx(x,y) ),
+          Dinv0( 2*idx(x,y)+1 ), Dinv1( 2*idx(x,y)+1 );
+      }
     }
   }
-
-
-  {
-    std::ifstream ifs( dir_data+description+"Dinv1_cuda.dat",
-                       std::ios::in | std::ios::binary );
-    if(!ifs) assert(false);
-
-    double real, imag;
-    for(Idx i=0; i<2*Lx*Ly; ++i){
-      ifs.read((char*) &real, sizeof(double) );
-      ifs.read((char*) &imag, sizeof(double) );
-      Dinv1_cuda[i] = real + I*imag;
-    }
-  }
-
-  // std::cout << (Dinv0 - Dinv0_cuda).norm() << std::endl;
-  // std::cout << (Dinv1 - Dinv1_cuda).norm() << std::endl;
-
-  // std::cout << Dinv0 - Dinv0_cuda << std::endl;
 
 
   // -----------------------------------
 
-  Dinv0 = Dinv0_cuda;
-  Dinv1 = Dinv1_cuda;
+  {
+    Vect Dinv0(2*Lx*Ly);
+    Vect Dinv1(2*Lx*Ly);
 
-  std::vector<M2> Dinv_n_0(Lx*Ly);
+    {
+      std::ifstream ifs( dir_data+description+"Dinv_m1_0_0_cuda.dat",
+                         std::ios::in | std::ios::binary );
+      if(!ifs) assert(false);
 
-  for(int x=0; x<Lx; x++){
-    for(int y=0; y<Ly; y++){
-      Dinv_n_0[idx(x,y)] <<
-        Dinv0( 2*idx(x,y) ), Dinv1( 2*idx(x,y) ),
-        Dinv0( 2*idx(x,y)+1 ), Dinv1( 2*idx(x,y)+1 );
+      double real, imag;
+      for(Idx i=0; i<2*Lx*Ly; ++i){
+        ifs.read((char*) &real, sizeof(double) );
+        ifs.read((char*) &imag, sizeof(double) );
+        Dinv0[i] = real + I*imag;
+      }
+    }
+
+
+    {
+      std::ifstream ifs( dir_data+description+"Dinv_m1_0_1_cuda.dat",
+                         std::ios::in | std::ios::binary );
+      if(!ifs) assert(false);
+
+      double real, imag;
+      for(Idx i=0; i<2*Lx*Ly; ++i){
+        ifs.read((char*) &real, sizeof(double) );
+        ifs.read((char*) &imag, sizeof(double) );
+        Dinv1[i] = real + I*imag;
+      }
+    }
+
+
+    for(int x=0; x<Lx; x++){
+      for(int y=0; y<Ly; y++){
+        Dinv_n_A[idx(x,y)] <<
+          Dinv0( 2*idx(x,y) ), Dinv1( 2*idx(x,y) ),
+          Dinv0( 2*idx(x,y)+1 ), Dinv1( 2*idx(x,y)+1 );
+      }
     }
   }
 
-  // PACKAGE IT!!!
 
+  // -----------------------------------
+
+  {
+    Vect Dinv0(2*Lx*Ly);
+    Vect Dinv1(2*Lx*Ly);
+
+    {
+      std::ifstream ifs( dir_data+description+"Dinv_1_m1_0_cuda.dat",
+                         std::ios::in | std::ios::binary );
+      if(!ifs) assert(false);
+
+      double real, imag;
+      for(Idx i=0; i<2*Lx*Ly; ++i){
+        ifs.read((char*) &real, sizeof(double) );
+        ifs.read((char*) &imag, sizeof(double) );
+        Dinv0[i] = real + I*imag;
+      }
+    }
+
+
+    {
+      std::ifstream ifs( dir_data+description+"Dinv_1_m1_1_cuda.dat",
+                         std::ios::in | std::ios::binary );
+      if(!ifs) assert(false);
+
+      double real, imag;
+      for(Idx i=0; i<2*Lx*Ly; ++i){
+        ifs.read((char*) &real, sizeof(double) );
+        ifs.read((char*) &imag, sizeof(double) );
+        Dinv1[i] = real + I*imag;
+      }
+    }
+
+
+    for(int x=0; x<Lx; x++){
+      for(int y=0; y<Ly; y++){
+        Dinv_n_B[idx(x,y)] <<
+          Dinv0( 2*idx(x,y) ), Dinv1( 2*idx(x,y) ),
+          Dinv0( 2*idx(x,y)+1 ), Dinv1( 2*idx(x,y)+1 );
+      }
+    }
+  }
+
+
+  // -----------------------------------
+
+  {
+    Vect Dinv0(2*Lx*Ly);
+    Vect Dinv1(2*Lx*Ly);
+
+    {
+      std::ifstream ifs( dir_data+description+"Dinv_0_1_0_cuda.dat",
+                         std::ios::in | std::ios::binary );
+      if(!ifs) assert(false);
+
+      double real, imag;
+      for(Idx i=0; i<2*Lx*Ly; ++i){
+        ifs.read((char*) &real, sizeof(double) );
+        ifs.read((char*) &imag, sizeof(double) );
+        Dinv0[i] = real + I*imag;
+      }
+    }
+
+
+    {
+      std::ifstream ifs( dir_data+description+"Dinv_0_1_1_cuda.dat",
+                         std::ios::in | std::ios::binary );
+      if(!ifs) assert(false);
+
+      double real, imag;
+      for(Idx i=0; i<2*Lx*Ly; ++i){
+        ifs.read((char*) &real, sizeof(double) );
+        ifs.read((char*) &imag, sizeof(double) );
+        Dinv1[i] = real + I*imag;
+      }
+    }
+
+
+    for(int x=0; x<Lx; x++){
+      for(int y=0; y<Ly; y++){
+        Dinv_n_C[idx(x,y)] <<
+          Dinv0( 2*idx(x,y) ), Dinv1( 2*idx(x,y) ),
+          Dinv0( 2*idx(x,y)+1 ), Dinv1( 2*idx(x,y)+1 );
+      }
+    }
+  }
+
+
+  // -----------------------------------
+
+
+
+  // PACKAGE IT!!!
   M2 eps, eps_inv;
   eps << 0, 1, -1, 0;
   eps_inv << 0, -1, 1, 0;
@@ -115,7 +214,7 @@ int main(){
   {
     for(int b=0; b<SIX; b++){
       V2 e = get_e( b );
-      gamma[b] = e(0)*sigma[2] + e(1)*sigma[1];
+      gamma[b] = e(0)*sigma[1] + e(1)*sigma[2];
     }
   }
 

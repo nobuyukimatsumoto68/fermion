@@ -37,7 +37,9 @@ int main(){
 
   set2zero(e, N);
   e[ 2*idx(xx, yy) ] = cplx(1.0);
+
   multDdagger_wrapper( e, e );
+  // multD_wrapper( e, e );
 
   set2zero(Dinv, N);
   solve(Dinv, e);

@@ -61,6 +61,8 @@ __host__
 void set2zero( double* v, const Idx size ){ for(Idx i=0; i<size; i++) v[i] = 0.0; }
 __host__
 void set2zero( Complex* v, const Idx size ){ for(Idx i=0; i<size; i++) v[i] = cplx(0.0); }
+__host__
+void set2zero( unsigned long* v, const Idx size ){ for(Idx i=0; i<size; i++) v[i] = 0; }
 
 
 __global__
@@ -76,7 +78,11 @@ void set_zero(Complex* d_v){
 
 
 __host__ __device__
-Idx idx(const int x, const int y){ return x + Lx*y; }
+int mod(const int a, const int b){ return (b +(a%b))%b; }
+
+
+__host__ __device__
+Idx idx(const int x, const int y){ return (x+Lx)%Lx + Lx * ((y+Ly)%Ly); }
 
 
 __host__ __device__
@@ -86,9 +92,6 @@ void get_xy(int& x, int& y, const Idx i){
   assert( i == idx(x,y) );
 }
 
-
-__host__ __device__
-int mod(const int a, const int b){ return (b +(a%b))%b; }
 
 
 __host__ __device__
@@ -112,25 +115,25 @@ int is_link(const int x, const int y, const int mu) { // return c or -1
 
 
 __host__ __device__
-int cshift(int& xp, int& yp, const int x, const int y, const int mu){
+int cshift(int& xp, int& yp, const int x, const int y, const int mu, const int nu){
   int res = 1;
 
   if(mu==0){
     xp=mod(x-1,Lx);
     yp=y;
 
-    if(x==0) res *= -1;
+    if(x==0 && nu>=3) res *= -1;
   }
   else if(mu==1){
     xp=mod(x+1,Lx);
     yp=mod(y-1,Ly);
 
-    if(x==Lx-1) res *= -1;
-    if(y==0) {
-      if(is_periodic_orthogonal) {
-        if(xp-Ly/2<0) res *= -1;
-        xp=mod(xp-int(Ly/2),Lx);
-      }
+    if(x==Lx-1 && nu>=3) res *= -1;
+    if(y==0 && nu%2==1) {
+      // if(is_periodic_orthogonal) {
+      //   if(xp-Ly/2<0) res *= -1;
+      //   xp=mod(xp-int(Ly/2),Lx);
+      // }
       res *= -1;
     }
   }
@@ -138,11 +141,11 @@ int cshift(int& xp, int& yp, const int x, const int y, const int mu){
     xp=x;
     yp=mod(y+1,Ly);
 
-    if(y==Ly-1) {
-      if(is_periodic_orthogonal) {
-        if(Lx<=xp+Ly/2) res *= -1;
-        xp=mod(xp+int(Ly/2),Lx);
-      }
+    if(y==Ly-1 && nu%2==1) {
+      // if(is_periodic_orthogonal) {
+      //   if(Lx<=xp+Ly/2) res *= -1;
+      //   xp=mod(xp+int(Ly/2),Lx);
+      // }
       res *= -1;
     }
   }
@@ -150,18 +153,18 @@ int cshift(int& xp, int& yp, const int x, const int y, const int mu){
     xp=mod(x+1,Lx);
     yp=y;
 
-    if(x==Lx-1) res *= -1;
+    if(x==Lx-1 && nu>=3) res *= -1;
   }
   else if(mu==4){
     xp=mod(x-1,Lx);
     yp=mod(y+1,Ly);
 
-    if(x==0) res *= -1;
-    if(y==Ly-1) {
-      if(is_periodic_orthogonal) {
-        if(Lx<=xp+Ly/2) res *= -1;
-        xp=mod(xp+int(Ly/2),Lx);
-      }
+    if(x==0 && nu>=3) res *= -1;
+    if(y==Ly-1 && nu%2==1) {
+      // if(is_periodic_orthogonal) {
+      //   if(Lx<=xp+Ly/2) res *= -1;
+      //   xp=mod(xp+int(Ly/2),Lx);
+      // }
       res *= -1;
     }
   }
@@ -169,36 +172,35 @@ int cshift(int& xp, int& yp, const int x, const int y, const int mu){
     xp=x;
     yp=mod(y-1,Ly);
 
-    if(y==0) {
-      if(is_periodic_orthogonal) {
-        if(xp-Ly/2<0) res *= -1;
-        xp=mod(xp-int(Ly/2),Lx);
-      }
+    if(y==0 && nu%2==1 ) {
+      // if(is_periodic_orthogonal) {
+      //   if(xp-Ly/2<0) res *= -1;
+      //   xp=mod(xp-int(Ly/2),Lx);
+      // }
       res *= -1;
     }
   }
   else assert(false);
-
   return res;
 }
 
 
 __host__  __device__
-int cshift_minus(int& xp, int& yp, const int x, const int y, const int mu){
+int cshift_minus(int& xp, int& yp, const int x, const int y, const int mu, const int nu){
   int res = 1;
 
   if(mu==0){
     xp=mod(x+1,Lx);
     yp=y;
 
-    if(x==Lx-1) res *= -1;
+    if(x==Lx-1 && nu>=3) res *= -1;
   }
   else if(mu==1){
     xp=mod(x-1,Lx);
     yp=mod(y+1,Ly);
 
-    if(x==0) res *= -1;
-    if(y==Ly-1) {
+    if(x==0 && nu>=3) res *= -1;
+    if(y==Ly-1 && nu%2==1) {
       // if(is_periodic_orthogonal) {
       //   if(Lx<=xp+Ly/2) res *= -1;
       //   xp=mod(xp+int(Ly/2),Lx);
@@ -210,7 +212,7 @@ int cshift_minus(int& xp, int& yp, const int x, const int y, const int mu){
     xp=x;
     yp=mod(y-1,Ly);
 
-    if(y==0) {
+    if(y==0 && nu%2==1) {
       // if(is_periodic_orthogonal) {
       //   if(xp-Ly/2<0) res *= -1;
       //   xp=mod(xp-int(Ly/2),Lx);
@@ -222,14 +224,14 @@ int cshift_minus(int& xp, int& yp, const int x, const int y, const int mu){
     xp=mod(x-1,Lx);
     yp=y;
 
-    if(x==0) res *= -1;
+    if(x==0 && nu>=3) res *= -1;
   }
   else if(mu==4){
     xp=mod(x+1,Lx);
     yp=mod(y-1,Ly);
 
-    if(x==Lx-1) res *= -1;
-    if(y==0) {
+    if(x==Lx-1 && nu>=3) res *= -1;
+    if(y==0 && nu%2==1) {
       // if(is_periodic_orthogonal) {
       //   if(xp-Ly/2<0) res *= -1;
       //   xp=mod(xp-int(Ly/2),Lx);
@@ -241,7 +243,7 @@ int cshift_minus(int& xp, int& yp, const int x, const int y, const int mu){
     xp=x;
     yp=mod(y+1,Ly);
 
-    if(y==Ly-1) {
+    if(y==Ly-1 && nu%2==1) {
       // if(is_periodic_orthogonal) {
       //   if(Lx<=xp+Ly/2) res *= -1;
       //   xp=mod(xp+int(Ly/2),Lx);
@@ -295,45 +297,44 @@ void daxpy(Complex* d_res, Complex* d_a, Complex* d_x, Complex* d_y){
 
 
 __device__
-void Wilson_projector( Complex* res, const int mu, const int sign = +1 ){
+void Wilson_projector( Complex* res, const int mu){
   double e[2];
   get_e(e, mu);
 
   res[0] = cplx(0.5);
   res[3] = cplx(0.5);
 
-  res[1] = - sign * 0.5 * ( e[0]-cuI*e[1] );
-  res[2] = - sign * 0.5 * ( e[0]+cuI*e[1] );
-  // res[1] = 0.5 * ( e[0]-cuI*e[1] );
-  // res[2] = 0.5 * ( e[0]+cuI*e[1] );
+  // res[1] = - sign * 0.5 * ( e[0]-cuI*e[1] );
+  // res[2] = - sign * 0.5 * ( e[0]+cuI*e[1] );
+  res[1] = -0.5 * ( e[0]-cuI*e[1] );
+  res[2] = -0.5 * ( e[0]+cuI*e[1] );
 }
 
 
 
 __global__
-void multD ( Complex* res, const Complex* v ){
+void multD ( Complex* res, const Complex* v, const int nu ){
   Idx i = blockIdx.x*blockDim.x + threadIdx.x;
   if(i<M) {
     int x,y;
     get_xy(x,y,i);
 
     if( is_site(x,y) ){
-      res[2*i] = res[2*i] + 0.5*v[2*i];
-      res[2*i+1] = res[2*i+1] + 0.5*v[2*i+1];
+      res[2*i] = res[2*i] + v[2*i];
+      res[2*i+1] = res[2*i+1] + v[2*i+1];
     }
 
     for(int mu=0; mu<SIX; mu++){
-      // const int c = is_link(x,y,mu);
       if( is_link(x,y,mu) ) {
         int xp, yp;
-        const int sign = cshift( xp, yp, x, y, mu );
+        const int sign = cshift( xp, yp, x, y, mu, nu );
         const Idx idx2 = 2*idx(xp,yp);
 
         Complex P[4];
         Wilson_projector( P, mu );
 
-        res[2*i] = res[2*i] - sign * 0.5 * kappa * (P[0]*v[idx2] + P[1]*v[idx2+1]);
-        res[2*i+1] = res[2*i+1] - sign * 0.5 * kappa * (P[2]*v[idx2] + P[3]*v[idx2+1]);
+        res[2*i] = res[2*i] - sign * kappa * (P[0]*v[idx2] + P[1]*v[idx2+1]);
+        res[2*i+1] = res[2*i+1] - sign * kappa * (P[2]*v[idx2] + P[3]*v[idx2+1]);
       }
     }
   }
@@ -342,28 +343,28 @@ void multD ( Complex* res, const Complex* v ){
 
 
 __global__
-void multDdagger ( Complex* res, const Complex* v ){
+void multDdagger ( Complex* res, const Complex* v, const int nu ){
   Idx i = blockIdx.x*blockDim.x + threadIdx.x;
   if(i<M){
     int x,y;
     get_xy(x,y,i);
 
     if( is_site(x,y) ){
-      res[2*i] = res[2*i] + 0.5*v[2*i];
-      res[2*i+1] = res[2*i+1] + 0.5*v[2*i+1];
+      res[2*i] = res[2*i] + v[2*i];
+      res[2*i+1] = res[2*i+1] + v[2*i+1];
     }
 
     for(int mu=0; mu<SIX; mu++){
       if( is_link(x,y, (mu+THREE)%SIX) ) {
         int xp, yp;
-        const int sign = cshift_minus( xp, yp, x, y, mu );
+        const int sign = cshift_minus( xp, yp, x, y, mu, nu );
         const Idx idx2 = 2*idx(xp,yp);
 
         Complex P[4];
         Wilson_projector( P, mu );
 
-        res[2*i] = res[2*i] - sign * 0.5 * kappa * (P[0]*v[idx2] + P[1]*v[idx2+1]);
-        res[2*i+1] = res[2*i+1] - sign * 0.5 * kappa * (P[2]*v[idx2] + P[3]*v[idx2+1]);
+        res[2*i] = res[2*i] - sign * kappa * (P[0]*v[idx2] + P[1]*v[idx2+1]);
+        res[2*i+1] = res[2*i+1] - sign * kappa * (P[2]*v[idx2] + P[3]*v[idx2+1]);
       }
     }
   }
@@ -372,7 +373,7 @@ void multDdagger ( Complex* res, const Complex* v ){
 
 
 __host__
-void multDdagger_wrapper(Complex* v, Complex* v0){
+void multDdagger_wrapper(Complex* v, Complex* v0, const int nu){
   Complex *d_v, *d_v0;
 
   cudacheck(cudaMalloc(&d_v, N*CD));
@@ -381,7 +382,7 @@ void multDdagger_wrapper(Complex* v, Complex* v0){
   cudacheck(cudaMemcpy(d_v0, v0, N*CD, H2D));
 
   set_zero<<<NBlocks, NThreadsPerBlock>>>(d_v);
-  multDdagger<<<NBlocks, NThreadsPerBlock>>>(d_v, d_v0);
+  multDdagger<<<NBlocks, NThreadsPerBlock>>>(d_v, d_v0, nu);
 
   cudacheck(cudaMemcpy(v, d_v, N*CD, D2H));
 
@@ -391,7 +392,7 @@ void multDdagger_wrapper(Complex* v, Complex* v0){
 
 
 __host__
-void multD_wrapper(Complex* v, Complex* v0){
+void multD_wrapper(Complex* v, Complex* v0, const int nu){
   Complex *d_v, *d_v0;
 
   cudacheck(cudaMalloc(&d_v, N*CD));
@@ -400,7 +401,7 @@ void multD_wrapper(Complex* v, Complex* v0){
   cudacheck(cudaMemcpy(d_v0, v0, N*CD, H2D));
 
   set_zero<<<NBlocks, NThreadsPerBlock>>>(d_v);
-  multD<<<NBlocks, NThreadsPerBlock>>>(d_v, d_v0);
+  multD<<<NBlocks, NThreadsPerBlock>>>(d_v, d_v0, nu);
 
   cudacheck(cudaMemcpy(v, d_v, N*CD, D2H));
 
@@ -412,12 +413,12 @@ void multD_wrapper(Complex* v, Complex* v0){
 
 
 __host__
-void multA(Complex* d_v, Complex* d_tmp, Complex* d_v0){
+void multA(Complex* d_v, Complex* d_tmp, Complex* d_v0, const int nu){
   set_zero<<<NBlocks, NThreadsPerBlock>>>(d_tmp);
-  multD<<<NBlocks, NThreadsPerBlock>>>(d_tmp, d_v0);
+  multD<<<NBlocks, NThreadsPerBlock>>>(d_tmp, d_v0, nu);
 
   set_zero<<<NBlocks, NThreadsPerBlock>>>(d_v);
-  multDdagger<<<NBlocks, NThreadsPerBlock>>>(d_v, d_tmp);
+  multDdagger<<<NBlocks, NThreadsPerBlock>>>(d_v, d_tmp, nu);
 }
 
 
@@ -477,7 +478,8 @@ void dot2self_normalized_wrapper(double& scalar, Complex* d_scalar, Complex* d_p
 
 
 __host__
-void solve(Complex x[N], Complex b[N], const double tol=1.0e-15, const int maxiter=1e5){
+void solve(Complex x[N], Complex b[N], const int nu,
+           const double tol=1.0e-15, const int maxiter=1e8){
   Complex *d_x, *d_r, *d_p, *d_q, *d_tmp;
   cudacheck(cudaMalloc(&d_x, N*CD));
   cudacheck(cudaMalloc(&d_r, N*CD));
@@ -506,7 +508,7 @@ void solve(Complex x[N], Complex b[N], const double tol=1.0e-15, const int maxit
     Complex gam;
 
     for(; k<maxiter; ++k){
-      multA(d_q, d_tmp, d_p);
+      multA(d_q, d_tmp, d_p, nu);
 
       dot_normalized_wrapper(gam, d_scalar, d_p, d_q);
 
