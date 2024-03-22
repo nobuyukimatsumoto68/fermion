@@ -24,47 +24,184 @@ int main(){
   omp_set_num_threads( nparallel );
 #endif
 
-  Vect Dinv0(2*Lx*Ly);
-  Vect Dinv1(2*Lx*Ly);
+  std::vector<M2> Dinv_n_0(Lx*Ly), Dinv_n_A(Lx*Ly), Dinv_n_B(Lx*Ly), Dinv_n_C(Lx*Ly);
 
   {
-    std::ifstream ifs( dir_data+description+"Dinv0_cuda.dat",
-                       std::ios::in | std::ios::binary );
-    if(!ifs) assert(false);
+    Vect Dinv0(2*Lx*Ly);
+    Vect Dinv1(2*Lx*Ly);
 
-    double real, imag;
-    for(Idx i=0; i<2*Lx*Ly; ++i){
-      ifs.read((char*) &real, sizeof(double) );
-      ifs.read((char*) &imag, sizeof(double) );
-      Dinv0[i] = real + I*imag;
+    {
+      std::ifstream ifs( dir_data+description+"Dinv_0_0_0_cuda.dat",
+                         std::ios::in | std::ios::binary );
+      if(!ifs) assert(false);
+
+      double real, imag;
+      for(Idx i=0; i<2*Lx*Ly; ++i){
+        ifs.read((char*) &real, sizeof(double) );
+        ifs.read((char*) &imag, sizeof(double) );
+        Dinv0[i] = real + I*imag;
+      }
+    }
+
+
+    {
+      std::ifstream ifs( dir_data+description+"Dinv_0_0_1_cuda.dat",
+                         // std::ifstream ifs( dir_data+description+"Dinv1_cuda.dat",
+                         std::ios::in | std::ios::binary );
+      if(!ifs) assert(false);
+
+      double real, imag;
+      for(Idx i=0; i<2*Lx*Ly; ++i){
+        ifs.read((char*) &real, sizeof(double) );
+        ifs.read((char*) &imag, sizeof(double) );
+        Dinv1[i] = real + I*imag;
+      }
+    }
+
+
+    for(int x=0; x<Lx; x++){
+      for(int y=0; y<Ly; y++){
+        Dinv_n_0[idx(x,y)] <<
+          Dinv0( 2*idx(x,y) ), Dinv1( 2*idx(x,y) ),
+          Dinv0( 2*idx(x,y)+1 ), Dinv1( 2*idx(x,y)+1 );
+      }
     }
   }
 
-
-  {
-    std::ifstream ifs( dir_data+description+"Dinv1_cuda.dat",
-                       std::ios::in | std::ios::binary );
-    if(!ifs) assert(false);
-
-    double real, imag;
-    for(Idx i=0; i<2*Lx*Ly; ++i){
-      ifs.read((char*) &real, sizeof(double) );
-      ifs.read((char*) &imag, sizeof(double) );
-      Dinv1[i] = real + I*imag;
-    }
-  }
 
   // -----------------------------------
 
-  std::vector<M2> Dinv_n_0(Lx*Ly);
+  {
+    Vect Dinv0(2*Lx*Ly);
+    Vect Dinv1(2*Lx*Ly);
 
-  for(int x=0; x<Lx; x++){
-    for(int y=0; y<Ly; y++){
-      Dinv_n_0[idx(x,y)] <<
-        Dinv0( 2*idx(x,y) ), Dinv1( 2*idx(x,y) ),
-        Dinv0( 2*idx(x,y)+1 ), Dinv1( 2*idx(x,y)+1 );
+    {
+      std::ifstream ifs( dir_data+description+"Dinv_m1_0_0_cuda.dat",
+                         std::ios::in | std::ios::binary );
+      if(!ifs) assert(false);
+
+      double real, imag;
+      for(Idx i=0; i<2*Lx*Ly; ++i){
+        ifs.read((char*) &real, sizeof(double) );
+        ifs.read((char*) &imag, sizeof(double) );
+        Dinv0[i] = real + I*imag;
+      }
+    }
+
+
+    {
+      std::ifstream ifs( dir_data+description+"Dinv_m1_0_1_cuda.dat",
+                         std::ios::in | std::ios::binary );
+      if(!ifs) assert(false);
+
+      double real, imag;
+      for(Idx i=0; i<2*Lx*Ly; ++i){
+        ifs.read((char*) &real, sizeof(double) );
+        ifs.read((char*) &imag, sizeof(double) );
+        Dinv1[i] = real + I*imag;
+      }
+    }
+
+
+    for(int x=0; x<Lx; x++){
+      for(int y=0; y<Ly; y++){
+        Dinv_n_A[idx(x,y)] <<
+          Dinv0( 2*idx(x,y) ), Dinv1( 2*idx(x,y) ),
+          Dinv0( 2*idx(x,y)+1 ), Dinv1( 2*idx(x,y)+1 );
+      }
     }
   }
+
+
+  // -----------------------------------
+
+  {
+    Vect Dinv0(2*Lx*Ly);
+    Vect Dinv1(2*Lx*Ly);
+
+    {
+      std::ifstream ifs( dir_data+description+"Dinv_1_m1_0_cuda.dat",
+                         std::ios::in | std::ios::binary );
+      if(!ifs) assert(false);
+
+      double real, imag;
+      for(Idx i=0; i<2*Lx*Ly; ++i){
+        ifs.read((char*) &real, sizeof(double) );
+        ifs.read((char*) &imag, sizeof(double) );
+        Dinv0[i] = real + I*imag;
+      }
+    }
+
+
+    {
+      std::ifstream ifs( dir_data+description+"Dinv_1_m1_1_cuda.dat",
+                         std::ios::in | std::ios::binary );
+      if(!ifs) assert(false);
+
+      double real, imag;
+      for(Idx i=0; i<2*Lx*Ly; ++i){
+        ifs.read((char*) &real, sizeof(double) );
+        ifs.read((char*) &imag, sizeof(double) );
+        Dinv1[i] = real + I*imag;
+      }
+    }
+
+
+    for(int x=0; x<Lx; x++){
+      for(int y=0; y<Ly; y++){
+        Dinv_n_B[idx(x,y)] <<
+          Dinv0( 2*idx(x,y) ), Dinv1( 2*idx(x,y) ),
+          Dinv0( 2*idx(x,y)+1 ), Dinv1( 2*idx(x,y)+1 );
+      }
+    }
+  }
+
+
+  // -----------------------------------
+
+  {
+    Vect Dinv0(2*Lx*Ly);
+    Vect Dinv1(2*Lx*Ly);
+
+    {
+      std::ifstream ifs( dir_data+description+"Dinv_0_1_0_cuda.dat",
+                         std::ios::in | std::ios::binary );
+      if(!ifs) assert(false);
+
+      double real, imag;
+      for(Idx i=0; i<2*Lx*Ly; ++i){
+        ifs.read((char*) &real, sizeof(double) );
+        ifs.read((char*) &imag, sizeof(double) );
+        Dinv0[i] = real + I*imag;
+      }
+    }
+
+
+    {
+      std::ifstream ifs( dir_data+description+"Dinv_0_1_1_cuda.dat",
+                         std::ios::in | std::ios::binary );
+      if(!ifs) assert(false);
+
+      double real, imag;
+      for(Idx i=0; i<2*Lx*Ly; ++i){
+        ifs.read((char*) &real, sizeof(double) );
+        ifs.read((char*) &imag, sizeof(double) );
+        Dinv1[i] = real + I*imag;
+      }
+    }
+
+
+    for(int x=0; x<Lx; x++){
+      for(int y=0; y<Ly; y++){
+        Dinv_n_C[idx(x,y)] <<
+          Dinv0( 2*idx(x,y) ), Dinv1( 2*idx(x,y) ),
+          Dinv0( 2*idx(x,y)+1 ), Dinv1( 2*idx(x,y)+1 );
+      }
+    }
+  }
+
+
+  // -----------------------------------
 
   // PACKAGE IT!!!
 
@@ -76,9 +213,50 @@ int main(){
   {
     for(int b=0; b<SIX; b++){
       V2 e = get_e( b );
-      gamma[b] = e(0)*sigma[2] + e(1)*sigma[1];
+      gamma[b] = e(0)*sigma[1] + e(1)*sigma[2];
     }
   }
+
+  {
+#ifdef _OPENMP
+#pragma omp parallel for collapse(2) num_threads(nparallel)
+#endif
+    for(int m=0; m<THREE; m++){
+      for(int n=0; n<THREE; n++){
+
+        std::ofstream of( dir_data+description+"t_vev"+std::to_string(m)+std::to_string(n)+".dat",
+                          std::ios::out | std::ios::trunc);
+        if(!of) assert(false);
+        of << std::scientific << std::setprecision(15);
+
+        int x=0, y=0;
+        if(!is_site(x,y)) assert(false);
+
+        const int ch = mod(x-y, 3);
+        if(ch!=0) assert(false);
+
+        int xpn, ypn;
+        int sign = cshift(xpn, ypn, x, y, n);
+
+        std::vector<M2> Dinv_n_0pn;
+        if(n==0) Dinv_n_0pn = Dinv_n_A;
+        else if(n==1) Dinv_n_0pn = Dinv_n_B;
+        else if(n==2) Dinv_n_0pn = Dinv_n_C;
+        else assert(false);
+
+        const M2& Dinv_0_0pn = sign * Dinv_n_0pn[idx(x,y)];
+        // const M2 dinv_xpb = sign1 * Dinv_n_0[idx(xpb,ypb)];
+
+        const Complex tr = ( gamma[m] * Dinv_0_0pn ).trace();
+        of << tr.real() << " " << tr.imag() << " "
+           << m << " " << n << " " << std::endl;
+      }}
+  }
+
+
+
+
+
 
 //   {
 //     const M2 eps_gamma_a = eps_inv.transpose() * sigma[2].transpose();
@@ -129,33 +307,33 @@ int main(){
 
   // PACKAGE IT!!!
 
-  {
-#ifdef _OPENMP
-#pragma omp parallel for collapse(2) num_threads(nparallel)
-#endif
-    for(int a=0; a<THREE; a++){
-      for(int b=0; b<THREE; b++){
+//   {
+// #ifdef _OPENMP
+// #pragma omp parallel for collapse(2) num_threads(nparallel)
+// #endif
+//     for(int a=0; a<THREE; a++){
+//       for(int b=0; b<THREE; b++){
 
-        std::ofstream of( dir_data+description+"t_vev"+std::to_string(a)+std::to_string(b)+".dat",
-                          std::ios::out | std::ios::trunc);
-        if(!of) assert(false);
-        of << std::scientific << std::setprecision(15);
+//         std::ofstream of( dir_data+description+"t_vev"+std::to_string(a)+std::to_string(b)+".dat",
+//                           std::ios::out | std::ios::trunc);
+//         if(!of) assert(false);
+//         of << std::scientific << std::setprecision(15);
 
-        int x=0, y=0;
-        if(!is_site(x,y)) assert(false);
+//         int x=0, y=0;
+//         if(!is_site(x,y)) assert(false);
 
-        const int ch = mod(x-y, 3);
-        if(ch!=0) assert(false);
+//         const int ch = mod(x-y, 3);
+//         if(ch!=0) assert(false);
 
-        int xpb, ypb;
-        int sign1 = cshift(xpb, ypb, x, y, b);
-        const M2 dinv_xpb = sign1 * Dinv_n_0[idx(xpb,ypb)];
+//         int xpb, ypb;
+//         int sign1 = cshift(xpb, ypb, x, y, b);
+//         const M2 dinv_xpb = sign1 * Dinv_n_0[idx(xpb,ypb)];
 
-        const Complex tr = ( gamma[a] * dinv_xpb ).trace();
-        of << tr.real() << " " << tr.imag() << " "
-           << ch << " " << a << " " << b << " " << std::endl;
-      }}
-  }
+//         const Complex tr = ( gamma[a] * dinv_xpb ).trace();
+//         of << tr.real() << " " << tr.imag() << " "
+//            << ch << " " << a << " " << b << " " << std::endl;
+//       }}
+//   }
 
 
   return 0;

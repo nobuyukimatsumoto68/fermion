@@ -218,53 +218,116 @@ int main(){
     }
   }
 
+
+  // std::vector<M2> Dinv_n_0(Lx*Ly), Dinv_n_A(Lx*Ly), Dinv_n_B(Lx*Ly), Dinv_n_C(Lx*Ly)
+  // 00 - 00
   {
-    const M2 eps_gamma_a = eps_inv.transpose() * sigma[2].transpose();
-    const M2 eps_gamma_c = eps * sigma[2];
+    // const int m=0, n=0, r=0, s=0;
 #ifdef _OPENMP
-#pragma omp parallel for num_threads(nparallel)
+#pragma omp parallel for collapse(4) num_threads(nparallel)
 #endif
-    for(int s=0; s<THREE; s++){
-      for(int b=0; b<THREE; b++){
+    for(int m=0; m<THREE; m++){
+      for(int s=0; s<THREE; s++){
+        for(int r=0; r<THREE; r++){
+          for(int n=0; n<THREE; n++){
 
-        {
-          // inside loop
-          std::ofstream of( dir_data+description+"t0"+std::to_string(s)+"t0"+std::to_string(b)+".dat",
-                            std::ios::out | std::ios::trunc);
-          if(!of) assert(false);
-          of << std::scientific << std::setprecision(15);
+            int dum1,dum2;
+            int sign1 = cshift(dum1, dum2, 0, 0, n);
 
-          // inside loop
-          for(int y=0; y<Ly; y++){
-            for(int x=0; x<Lx; x++){
-              if(!is_site(x,y)) continue;
+            std::vector<M2> Dinv_n_0pn;
+            if(n==0) Dinv_n_0pn = Dinv_n_A;
+            else if(n==1) Dinv_n_0pn = Dinv_n_B;
+            else if(n==2) Dinv_n_0pn = Dinv_n_C;
+            else assert(false);
 
-              const int ch = mod(x-y, 3);
-              if(ch==0){
-                const M2 dinv_x = Dinv_n_0[idx(x,y)];
+            std::ofstream of( dir_data+description+"tt"+std::to_string(m)+std::to_string(n)+std::to_string(r)+std::to_string(s)+".dat",
+                              std::ios::out | std::ios::trunc);
+            if(!of) assert(false);
+            of << std::scientific << std::setprecision(15);
+
+            for(int y=0; y<Ly; y++){
+              for(int x=0; x<Lx; x++){
+                if(!is_site(x,y)) continue;
+                const int ch = mod(x-y, 3);
+                if(ch!=0) continue;
+
+                const M2& Dinv_x_0 = Dinv_n_0[idx(x,y)];
+                const M2& Dinv_x_0pn = sign1 * Dinv_n_0pn[idx(x,y)];
 
                 int xps, yps;
-                int sign1 = cshift(xps, yps, x, y, s);
-                const M2 dinv_xps = sign1 * Dinv_n_0[idx(xps,yps)];
+                int sign2 = cshift(xps, yps, x, y, s);
+                const M2& Dinv_xps_0 = sign2 * Dinv_n_0[idx(xps,yps)];
+                const M2& Dinv_xps_0pn = sign1 * sign2 * Dinv_n_0pn[idx(xps,yps)];
 
-                int xmb, ymb;
-                int sign2 = cshift_minus(xmb, ymb, x, y, b);
-                int xpsmb, ypsmb;
-                int sign3 = cshift(xpsmb, ypsmb, xmb, ymb, s);
-                const M2 dinv_xmb = sign2*Dinv_n_0[idx(xmb,ymb)];
-                const M2 dinv_xpsmb = sign2*sign3*Dinv_n_0[idx(xpsmb,ypsmb)];
+                const Complex tr1 = ( Dinv_x_0pn * gamma[m] * eps_inv * Dinv_xps_0.transpose() * eps * gamma[r] ).trace();
+                const Complex tr2 = ( Dinv_xps_0pn * gamma[m] * eps_inv * Dinv_x_0.transpose() * eps * gamma[r] ).trace();
+                const Complex corr = - tr1 + tr2;
 
-                const Complex tr1 = ( eps_gamma_a * dinv_x.transpose() * eps_gamma_c * dinv_xpsmb ).trace();
-                const Complex tr2 = ( eps_gamma_a * dinv_xps.transpose() * eps_gamma_c * dinv_xmb ).trace();
-                const Complex corr = tr1 - tr2;
                 of << x << " " << y << " "
+                   << m << " " << n << " " << r << " " << s << " "
                    << corr.real() << " " << corr.imag() << " "
-                   << ch << " " << s << " " << b << " " << std::endl;
-              } // end if
-            }} // end for x,y
-        }
-      }}
+                   << std::endl;
+              }}
+          }}}}
   }
+
+
+
+
+
+
+
+
+
+
+
+  //   {
+//     const M2 eps_gamma_a = eps_inv.transpose() * sigma[2].transpose();
+//     const M2 eps_gamma_c = eps * sigma[2];
+// #ifdef _OPENMP
+// #pragma omp parallel for num_threads(nparallel)
+// #endif
+//     for(int s=0; s<THREE; s++){
+//       for(int b=0; b<THREE; b++){
+
+//         {
+//           // inside loop
+//           std::ofstream of( dir_data+description+"t0"+std::to_string(s)+"t0"+std::to_string(b)+".dat",
+//                             std::ios::out | std::ios::trunc);
+//           if(!of) assert(false);
+//           of << std::scientific << std::setprecision(15);
+
+//           // inside loop
+//           for(int y=0; y<Ly; y++){
+//             for(int x=0; x<Lx; x++){
+//               if(!is_site(x,y)) continue;
+
+//               const int ch = mod(x-y, 3);
+//               if(ch==0){
+//                 const M2 dinv_x = Dinv_n_0[idx(x,y)];
+
+//                 int xps, yps;
+//                 int sign1 = cshift(xps, yps, x, y, s);
+//                 const M2 dinv_xps = sign1 * Dinv_n_0[idx(xps,yps)];
+
+//                 int xmb, ymb;
+//                 int sign2 = cshift_minus(xmb, ymb, x, y, b);
+//                 int xpsmb, ypsmb;
+//                 int sign3 = cshift(xpsmb, ypsmb, xmb, ymb, s);
+//                 const M2 dinv_xmb = sign2*Dinv_n_0[idx(xmb,ymb)];
+//                 const M2 dinv_xpsmb = sign2*sign3*Dinv_n_0[idx(xpsmb,ypsmb)];
+
+//                 const Complex tr1 = ( eps_gamma_a * dinv_x.transpose() * eps_gamma_c * dinv_xpsmb ).trace();
+//                 const Complex tr2 = ( eps_gamma_a * dinv_xps.transpose() * eps_gamma_c * dinv_xmb ).trace();
+//                 const Complex corr = tr1 - tr2;
+//                 of << x << " " << y << " "
+//                    << corr.real() << " " << corr.imag() << " "
+//                    << ch << " " << s << " " << b << " " << std::endl;
+//               } // end if
+//             }} // end for x,y
+//         }
+//       }}
+//   }
 
   // PACKAGE IT!!!
 

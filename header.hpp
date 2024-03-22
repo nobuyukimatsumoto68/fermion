@@ -54,7 +54,7 @@ Pauli get_Pauli() {
 Idx idx(const int x, const int y){ return x + Lx*y; }
 
 
-int cshift(int& xp, int& yp, const int x, const int y, const int mu, const int nu){
+int cshift(int& xp, int& yp, const int x, const int y, const int mu){
   int res = 1;
 
   if(mu==0){
@@ -124,7 +124,7 @@ int cshift(int& xp, int& yp, const int x, const int y, const int mu, const int n
 }
 
 
-int cshift_minus(int& xp, int& yp, const int x, const int y, const int mu, const int nu){
+int cshift_minus(int& xp, int& yp, const int x, const int y, const int mu){
   int res = 1;
 
   if(mu==0){
@@ -238,7 +238,7 @@ M2 Wilson_projector( const int mu ){
 }
 
 
-Eigen::MatrixXcd get_Dirac_matrix ( const int nu ){ // const double Mu=1.0
+Eigen::MatrixXcd get_Dirac_matrix (){ // const double Mu=1.0
   Eigen::MatrixXcd res = Eigen::MatrixXcd::Zero(TWO*Lx*Ly, TWO*Lx*Ly);
 
   for(int x=0; x<Lx; x++){
@@ -251,7 +251,7 @@ Eigen::MatrixXcd get_Dirac_matrix ( const int nu ){ // const double Mu=1.0
       for(int mu=0; mu<SIX; mu++){
         if( is_link(x,y,mu) ) {
           int xp, yp;
-          const int sign = cshift( xp, yp, x, y, mu, nu );
+          const int sign = cshift( xp, yp, x, y, mu );
           const Idx idx1 = 2*idx(x,y);
           const Idx idx2 = 2*idx(xp,yp);
           res.block<2,2>(idx1, idx2) = -sign * kappa * Wilson_projector(mu);
@@ -277,7 +277,7 @@ Eigen::MatrixXcd get_large_epsilon (){
 
 
 
-Eigen::VectorXcd multD_eigen ( const Eigen::VectorXcd& v, const int nu ){
+Eigen::VectorXcd multD_eigen ( const Eigen::VectorXcd& v){
   Eigen::VectorXcd res = Eigen::VectorXcd::Zero(2*Lx*Ly);
 
 #ifdef _OPENMP
@@ -297,7 +297,7 @@ Eigen::VectorXcd multD_eigen ( const Eigen::VectorXcd& v, const int nu ){
       for(int mu=0; mu<SIX; mu++){
         if( is_link(x,y,mu) ) {
           int xp, yp;
-          const int sign = cshift( xp, yp, x, y, mu, nu );
+          const int sign = cshift( xp, yp, x, y, mu );
           const Idx idx1 = 2*idx(x,y);
           const Idx idx2 = 2*idx(xp,yp);
           res.segment(idx1, 2) -= sign * kappa * Wilson_projector(mu) * v.segment(idx2, 2);
@@ -309,7 +309,7 @@ Eigen::VectorXcd multD_eigen ( const Eigen::VectorXcd& v, const int nu ){
 }
 
 
-Eigen::VectorXcd multDdagger_eigen ( const Eigen::VectorXcd& v, const int nu){
+Eigen::VectorXcd multDdagger_eigen ( const Eigen::VectorXcd& v ){
   Eigen::VectorXcd res = Eigen::VectorXcd::Zero(2*Lx*Ly);
 
 #ifdef _OPENMP
@@ -329,7 +329,7 @@ Eigen::VectorXcd multDdagger_eigen ( const Eigen::VectorXcd& v, const int nu){
       for(int mu=0; mu<SIX; mu++){
         if( is_link(x,y, (mu+THREE)%SIX) ) {
           int xp, yp;
-          const int sign = cshift_minus( xp, yp, x, y, mu, nu );
+          const int sign = cshift_minus( xp, yp, x, y, mu );
           const Idx idx1 = 2*idx(x,y);
           const Idx idx2 = 2*idx(xp,yp);
           res.segment(idx1, 2) -= sign * kappa * Wilson_projector(mu) * v.segment(idx2, 2);
@@ -343,16 +343,15 @@ Eigen::VectorXcd multDdagger_eigen ( const Eigen::VectorXcd& v, const int nu){
 
 
 
-Vect A(const Vect& v, const int nu){
-  Vect res = multD_eigen(v, nu);
-  res = multDdagger_eigen(res, nu);
+Vect A(const Vect& v){
+  Vect res = multD_eigen(v);
+  res = multDdagger_eigen(res);
   return res;
 }
 
 
 Vect CG(const Vect& init,
         const Vect& b,
-        const int nu,
         const double TOL=1.0e-15,
         const int MAXITER=1e5
         ){
@@ -371,7 +370,7 @@ Vect CG(const Vect& init,
   else{
     int k=0;
     for(; k<MAXITER; ++k){
-      const Vect q = A(p, nu);
+      const Vect q = A(p);
       const Complex gam = p.dot(q);
       const Complex al = mu/gam;
       x += al*p;

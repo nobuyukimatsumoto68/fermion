@@ -16,7 +16,15 @@
 
 
 
-int main(){
+// int main(){
+int main(int argc, char **argv){
+
+  if (argc>1){
+    for (int i = 0; i < argc; i++) {
+      nu = atoi(argv[1]);
+      printf("%s\n", argv[i]);
+    }
+  }
 
   int device_num;
   cudacheck(cudaGetDeviceCount(&device_num));
@@ -38,7 +46,7 @@ int main(){
 
     set2zero(e, N);
     e[ 2*idx(xx, yy) ] = cplx(1.0);
-    multDdagger_wrapper( e, e );
+    multDdagger_wrapper( e, e);
 
     set2zero(Dinv, N);
     solve(Dinv, e);
