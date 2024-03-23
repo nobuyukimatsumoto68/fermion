@@ -27,7 +27,7 @@ int main(){
   Vect Dinv1(2*Lx*Ly);
 
   {
-    std::ifstream ifs( dir_data+description+"Dinv0_cuda.dat",
+    std::ifstream ifs( dir_data+description+"Dinv_0_0_0_cuda.dat",
                        std::ios::in | std::ios::binary );
     if(!ifs) assert(false);
 
@@ -41,7 +41,7 @@ int main(){
 
 
   {
-    std::ifstream ifs( dir_data+description+"Dinv1_cuda.dat",
+    std::ifstream ifs( dir_data+description+"Dinv_0_0_1_cuda.dat",
                        std::ios::in | std::ios::binary );
     if(!ifs) assert(false);
 
@@ -90,12 +90,14 @@ int main(){
     }
   }
 
-  M2 eps, eps_inv;
-  eps << 0, 1, -1, 0;
-  eps_inv << 0, -1, 1, 0;
+  // M2 eps, eps_inv;
+  // eps << 0, 1, -1, 0;
+  // eps_inv << 0, -1, 1, 0;
+  M2 eps = get_eps();
+  M2 eps_inv = -eps;
 
   {
-    std::ofstream of( dir_data+description+"eps.dat",
+    std::ofstream of( dir_data+description+"eps_corr.dat",
                       std::ios::out | std::ios::trunc);
     if(!of) assert(false);
     of << std::scientific << std::setprecision(15);

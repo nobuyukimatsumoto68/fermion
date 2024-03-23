@@ -206,15 +206,17 @@ int main(){
 
 
   // PACKAGE IT!!!
-  M2 eps, eps_inv;
-  eps << 0, 1, -1, 0;
-  eps_inv << 0, -1, 1, 0;
+  // M2 eps, eps_inv;
+  // eps << 0, 1, -1, 0;
+  // eps_inv << 0, -1, 1, 0;
+  M2 eps = get_eps();
+  M2 eps_inv = -eps;
 
   std::array<M2, 6> gamma;
   {
     for(int b=0; b<SIX; b++){
-      V2 e = get_e( b );
-      gamma[b] = e(0)*sigma[1] + e(1)*sigma[2];
+      // V2 e = get_e( b );
+      gamma[b] = get_gamma(b);
     }
   }
 

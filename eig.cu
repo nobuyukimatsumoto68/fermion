@@ -64,7 +64,7 @@ int main(int argc, char **argv){
     for(Idx i=0; i<N; i++){
       set2zero(e, N);
       e[i] = cplx(1.0);
-      multD_wrapper( D+i*N, e, nu ); // column major
+      multD_wrapper( D+i*N, e ); // column major
     }
 
     free( e );
