@@ -226,7 +226,7 @@ int main(){
 
   int sx=1, sy=1;
   if(nu>=3) sx = -1;
-  if(nu%2==1) sy = -1;
+  if(nu/2==1) sy = -1;
 
   {
     // double Z = 1.0;

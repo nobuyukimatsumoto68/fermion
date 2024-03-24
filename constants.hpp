@@ -12,7 +12,7 @@ const int TWO = 2;
 const int THREE = 3;
 const int SIX = 6;
 
-int nu = 3; // 1,2,3,4 // PA, PP, AA, AP // xy
+int nu = 3; // 1,2,3,4 // PP, PA, AA, AP // xy
 // PP, PA, AA, AP
 
 const double m = 0.0;

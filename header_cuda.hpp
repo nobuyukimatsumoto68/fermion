@@ -129,7 +129,7 @@ int cshift(int& xp, int& yp, const int x, const int y, const int mu, const int n
     yp=mod(y-1,Ly);
 
     if(x==Lx-1 && nu_>=3) res *= -1;
-    if(y==0 && nu_%2==1) {
+    if(y==0 && nu_/2==1) {
       // if(is_periodic_orthogonal) {
       //   if(xp-Ly/2<0) res *= -1;
       //   xp=mod(xp-int(Ly/2),Lx);
@@ -141,7 +141,7 @@ int cshift(int& xp, int& yp, const int x, const int y, const int mu, const int n
     xp=x;
     yp=mod(y+1,Ly);
 
-    if(y==Ly-1 && nu_%2==1) {
+    if(y==Ly-1 && nu_/2==1) {
       // if(is_periodic_orthogonal) {
       //   if(Lx<=xp+Ly/2) res *= -1;
       //   xp=mod(xp+int(Ly/2),Lx);
@@ -160,7 +160,7 @@ int cshift(int& xp, int& yp, const int x, const int y, const int mu, const int n
     yp=mod(y+1,Ly);
 
     if(x==0 && nu_>=3) res *= -1;
-    if(y==Ly-1 && nu_%2==1) {
+    if(y==Ly-1 && nu_/2==1) {
       // if(is_periodic_orthogonal) {
       //   if(Lx<=xp+Ly/2) res *= -1;
       //   xp=mod(xp+int(Ly/2),Lx);
@@ -172,7 +172,7 @@ int cshift(int& xp, int& yp, const int x, const int y, const int mu, const int n
     xp=x;
     yp=mod(y-1,Ly);
 
-    if(y==0 && nu_%2==1 ) {
+    if(y==0 && nu_/2==1 ) {
       // if(is_periodic_orthogonal) {
       //   if(xp-Ly/2<0) res *= -1;
       //   xp=mod(xp-int(Ly/2),Lx);
@@ -200,7 +200,7 @@ int cshift_minus(int& xp, int& yp, const int x, const int y, const int mu, const
     yp=mod(y+1,Ly);
 
     if(x==0 && nu_>=3) res *= -1;
-    if(y==Ly-1 && nu_%2==1) {
+    if(y==Ly-1 && nu_/2==1) {
       // if(is_periodic_orthogonal) {
       //   if(Lx<=xp+Ly/2) res *= -1;
       //   xp=mod(xp+int(Ly/2),Lx);
@@ -212,7 +212,7 @@ int cshift_minus(int& xp, int& yp, const int x, const int y, const int mu, const
     xp=x;
     yp=mod(y-1,Ly);
 
-    if(y==0 && nu_%2==1) {
+    if(y==0 && nu_/2==1) {
       // if(is_periodic_orthogonal) {
       //   if(xp-Ly/2<0) res *= -1;
       //   xp=mod(xp-int(Ly/2),Lx);
@@ -231,7 +231,7 @@ int cshift_minus(int& xp, int& yp, const int x, const int y, const int mu, const
     yp=mod(y-1,Ly);
 
     if(x==Lx-1 && nu_>=3) res *= -1;
-    if(y==0 && nu_%2==1) {
+    if(y==0 && nu_/2==1) {
       // if(is_periodic_orthogonal) {
       //   if(xp-Ly/2<0) res *= -1;
       //   xp=mod(xp-int(Ly/2),Lx);
@@ -243,7 +243,7 @@ int cshift_minus(int& xp, int& yp, const int x, const int y, const int mu, const
     xp=x;
     yp=mod(y+1,Ly);
 
-    if(y==Ly-1 && nu_%2==1) {
+    if(y==Ly-1 && nu_/2==1) {
       // if(is_periodic_orthogonal) {
       //   if(Lx<=xp+Ly/2) res *= -1;
       //   xp=mod(xp+int(Ly/2),Lx);

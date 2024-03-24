@@ -12,11 +12,11 @@ DIR = ./
 
 # # all: solve.o solve.o eps.o tt.o
 
-# all: solve.o tt.o eps.o t_vev.o psipsi.o eig.o
-all: tt.o eps.o t_vev.o psipsi.o eig.o
+all: solve.o tt.o eps.o t_vev.o xixi.o eig.o
+# all: tt.o eps.o t_vev.o psipsi.o eig.o
 
-# solve.o: solve.cu header_cuda.hpp typedefs_cuda.hpp constants.hpp
-# 	$(NVCC) $< $(NVCCFLAGS) $(INCLUDES_CUDA) -o $(DIR)$@
+solve.o: solve.cu header_cuda.hpp typedefs_cuda.hpp constants.hpp
+	$(NVCC) $< $(NVCCFLAGS) $(INCLUDES_CUDA) -o $(DIR)$@
 
 tt.o: tt_corr.cc header.hpp typedefs.hpp constants.hpp
 	$(CXX) $< $(CXXFLAGS) $(INCLUDES) -o $(DIR)$@
@@ -24,7 +24,7 @@ tt.o: tt_corr.cc header.hpp typedefs.hpp constants.hpp
 t_vev.o: t_vev.cc header.hpp typedefs.hpp constants.hpp
 	$(CXX) $< $(CXXFLAGS) $(INCLUDES) -o $(DIR)$@
 
-psipsi.o: psipsi_corr.cc header.hpp typedefs.hpp constants.hpp
+xixi.o: xixi.cc header.hpp typedefs.hpp constants.hpp
 	$(CXX) $< $(CXXFLAGS) $(INCLUDES) -o $(DIR)$@
 
 eps.o: eps_corr.cc header.hpp typedefs.hpp constants.hpp
