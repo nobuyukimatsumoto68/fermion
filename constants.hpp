@@ -34,11 +34,15 @@ const double m = 0.0;
 // const unsigned long Lx = 6 * 6;
 // const unsigned long Ly = 6 * 12;
 
-// const unsigned long Lx = 6 * 8;
-// const unsigned long Ly = 6 * 16;
+const unsigned long Lx = 6 * 8;
+const unsigned long Ly = 6 * 16;
 
-const unsigned long Lx = 6 * 16;
-const unsigned long Ly = 6 * 32;
+// const unsigned long Lx = 6 * 16;
+// const unsigned long Ly = 6 * 32;
+
+// const unsigned long Lx = 6 * 16;
+// const unsigned long Ly = 6 * 16 * 3;
+
 
 // -------------------
 

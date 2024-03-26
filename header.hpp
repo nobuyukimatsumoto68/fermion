@@ -241,27 +241,7 @@ M2 get_gamma( const int mu ){
   return res;
 }
 
-// std::array<M2, 6> get_gamma(){
-//   std::array<M2, 6> gamma;
-//   {
-//     for(int b=0; b<SIX; b++){
-//       V2 e = get_e( b );
-//       gamma[b] = e(0)*sigma[1] + e(1)*sigma[2];
-//     }
-//   }
-//   return gamma;
-// }
-
-
 M2 Wilson_projector( const int mu ){
-  // V2 e = get_e(mu);
-  // std::array<M2, 6> gamma get_gamma(
-
-  // M2 res = -e(0)*sigma[1] - e(1)*sigma[2];
-  // res += ;
-  // M2 res = 0.5 * ( sigma[0] - gamma(mu) );
-  // res *= 0.5;
-  // const M2 gamma = gamma(mu);
   return 0.5 * ( sigma[0] - get_gamma(mu) );
 }
 

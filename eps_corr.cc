@@ -108,7 +108,7 @@ int main(){
         const int c = mod(x-y, 3);
         M2 dinv = Dinv_n_0[idx(x,y)];
         M2 tmp = eps_inv.transpose() * dinv.transpose() * eps * dinv;
-        Complex corr = 2.0 * tmp.trace();
+        Complex corr = 0.5 * tmp.trace();
         of << x << " " << y << " " << corr.real() << " " << corr.imag() << " " << c << std::endl;
       }}
   }
