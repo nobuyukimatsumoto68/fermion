@@ -206,42 +206,21 @@ int main(){
   M2 eps = get_eps();
   M2 eps_inv = -eps;
 
-  std::array<M2, 6> gamma;
-  for(int b=0; b<SIX; b++) gamma[b] = get_gamma(b);
-
   {
-#ifdef _OPENMP
-#pragma omp parallel for collapse(2) num_threads(nparallel)
-#endif
-    for(int m=0; m<THREE; m++){
-      for(int n=0; n<THREE; n++){
+    std::ofstream of( dir_data+description+"eps_vev.dat",
+                      std::ios::out | std::ios::trunc);
+    if(!of) assert(false);
+    of << std::scientific << std::setprecision(15);
 
-        std::ofstream of( dir_data+description+"t_vev"+std::to_string(m)+std::to_string(n)+".dat",
-                          std::ios::out | std::ios::trunc);
-        if(!of) assert(false);
-        of << std::scientific << std::setprecision(15);
+    int x=0, y=0;
+    if(!is_site(x,y)) assert(false);
 
-        int x=0, y=0;
-        if(!is_site(x,y)) assert(false);
+    const int ch = mod(x-y, 3);
+    if(ch!=0) assert(false);
+    const M2& Dinv_x_0 = Dinv_n_0[idx(x,y)];
 
-        const int ch = mod(x-y, 3);
-        if(ch!=0) assert(false);
-
-        int xpn, ypn;
-        int sign = cshift(xpn, ypn, x, y, n);
-
-        std::vector<M2> Dinv_n_0pn;
-        if(n==0) Dinv_n_0pn = Dinv_n_A;
-        else if(n==1) Dinv_n_0pn = Dinv_n_B;
-        else if(n==2) Dinv_n_0pn = Dinv_n_C;
-        else assert(false);
-
-        const M2& Dinv_0_0pn = sign * Dinv_n_0pn[idx(x,y)];
-
-        const Complex tr = -( gamma[m] * Dinv_0_0pn ).trace();
-        of << tr.real() << " " << tr.imag() << " "
-           << m << " " << n << " " << std::endl;
-      }}
+    const Complex tr = - Dinv_x_0.trace();
+    of << tr.real() << " " << tr.imag() << std::endl;
   }
 
   return 0;

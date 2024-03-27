@@ -12,7 +12,7 @@ DIR = ./
 
 # # all: solve.o solve.o eps.o tt.o
 
-all: solve.o tt.o eps.o t_vev.o xixi.o eig.o
+all: solve.o tt.o eps.o t_vev.o t_vev_v2.o eps_vev.o xixi.o eig.o tt_v2.o
 # all: tt.o eps.o t_vev.o psipsi.o eig.o
 
 solve.o: solve.cu header_cuda.hpp typedefs_cuda.hpp constants.hpp
@@ -21,7 +21,16 @@ solve.o: solve.cu header_cuda.hpp typedefs_cuda.hpp constants.hpp
 tt.o: tt_corr.cc header.hpp typedefs.hpp constants.hpp
 	$(CXX) $< $(CXXFLAGS) $(INCLUDES) -o $(DIR)$@
 
+tt_v2.o: tt_corr_v2.cc header.hpp typedefs.hpp constants.hpp
+	$(CXX) $< $(CXXFLAGS) $(INCLUDES) -o $(DIR)$@
+
 t_vev.o: t_vev.cc header.hpp typedefs.hpp constants.hpp
+	$(CXX) $< $(CXXFLAGS) $(INCLUDES) -o $(DIR)$@
+
+eps_vev.o: eps_vev.cc header.hpp typedefs.hpp constants.hpp
+	$(CXX) $< $(CXXFLAGS) $(INCLUDES) -o $(DIR)$@
+
+t_vev_v2.o: t_vev_v2.cc header.hpp typedefs.hpp constants.hpp
 	$(CXX) $< $(CXXFLAGS) $(INCLUDES) -o $(DIR)$@
 
 xixi.o: xixi.cc header.hpp typedefs.hpp constants.hpp

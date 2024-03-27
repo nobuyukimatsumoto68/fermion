@@ -425,9 +425,6 @@ int main(){
   }
 
   {
-#ifdef _OPENMP
-#pragma omp parallel for num_threads(nparallel)
-#endif
     std::ofstream of( dir_data+description+"EE.dat",
                       std::ios::out | std::ios::trunc);
     if(!of) assert(false);
@@ -478,7 +475,7 @@ int main(){
           const int ch = mod(x-y, 3);
           if(ch!=0) continue;
 
-          const M2& Dinv_x_0 = Dinv_n_0[idx(x,y)];
+          // const M2& Dinv_x_0 = Dinv_n_0[idx(x,y)];
           const M2& Dinv_x_0pn = sign1 * Dinv_n_0pn[idx(x,y)];
 
           const Complex tr1 = 0.25 * ( Dinv_x_0pn * eps_inv * Dinv_x_0pn.transpose() * eps ).trace();
@@ -508,7 +505,7 @@ int main(){
             const int ch = mod(x-y, 3);
             if(ch!=0) continue;
 
-            const M2& Dinv_x_0 = Dinv_n_0[idx(x,y)];
+            // const M2& Dinv_x_0 = Dinv_n_0[idx(x,y)];
 
             int xps, yps;
             int sign2 = cshift(xps, yps, x, y, s);
@@ -555,14 +552,12 @@ int main(){
             const int ch = mod(x-y, 3);
             if(ch!=0) continue;
 
-            const M2& Dinv_x_0pn = sign1 * Dinv_n_0pn[idx(x,y)];
-
             int xps, yps;
             int sign2 = cshift(xps, yps, x, y, s);
             const M2& Dinv_xps_0pn = sign1 * sign2 * Dinv_n_0pn[idx(xps,yps)];
 
-            const Complex tr1 = 0.5 * ( Dinv_xps_0pn * eps_inv * Dinv_xps_0pn.transpose() * eps ).trace();
-            const Complex tr2 = -0.5 * ( Dinv_xps_0pn * eps_inv * Dinv_xps_0pn.transpose() * eps ).trace();
+            const Complex tr1 = 0.25 * ( Dinv_xps_0pn * eps_inv * Dinv_xps_0pn.transpose() * eps ).trace();
+            const Complex tr2 = -0.25 * ( Dinv_xps_0pn * eps_inv * Dinv_xps_0pn.transpose() * eps ).trace();
             const Complex corr = - tr1 + tr2;
 
             of << x << " " << y << " "
