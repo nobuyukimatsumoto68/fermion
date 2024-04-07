@@ -26,6 +26,8 @@ int main(){
   Vect Dinv0(2*Lx*Ly);
   Vect Dinv1(2*Lx*Ly);
 
+  const std::string description = "Lx"+std::to_string(Lx)+"Ly"+std::to_string(Ly)+"nu"+std::to_string(nu);
+
   {
     std::ifstream ifs( dir_data+description+"Dinv_0_0_0_cuda.dat",
                        std::ios::in | std::ios::binary );

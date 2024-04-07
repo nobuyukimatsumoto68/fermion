@@ -2,6 +2,7 @@
 #include <iomanip>
 #include <cassert>
 #include <cstring>
+#include <vector>
 #include <fstream>
 #include <algorithm>
 
@@ -31,6 +32,7 @@ int main(int argc, char **argv){
       printf("%s\n", argv[i]);
     }
   }
+  const std::string description = "Lx"+std::to_string(Lx)+"Ly"+std::to_string(Ly)+"nu"+std::to_string(nu);
 
   int device;
   cudacheck(cudaGetDeviceCount(&device));
@@ -64,7 +66,7 @@ int main(int argc, char **argv){
     for(Idx i=0; i<N; i++){
       set2zero(e, N);
       e[i] = cplx(1.0);
-      multD_wrapper( D+i*N, e ); // column major
+      multD_wrapper( D+i*N, e, nu ); // column major
     }
 
     free( e );
@@ -210,17 +212,24 @@ int main(int argc, char **argv){
       exit(1);
     }
 
-    double log_abs_det = 0.0;
+    std::vector<double> zeros;
+    double log_abs_det_nozero = 0.0;
     // std::complex<double> det = 1.0;
     for(Idx i=0; i<Neff; i++) {
       // assert( imag(LU[i*Neff+i])<1.0e-14 );
       // log_det += std::log( real(LU[i*Neff+i]) );
       std::complex<double> tmp = real(LU[i*Neff+i]) + std::complex<double>(0.0,1.0)*imag(LU[i*Neff+i]);
-      log_abs_det += std::log( abs(tmp) );
+      if( abs(arg(tmp))>1.0e-13 ) std::cout << "arg>0: " << tmp << std::endl;
+      if( abs(tmp)>1.0e-13 ) log_abs_det_nozero += std::log( abs(tmp) );
+      else zeros.push_back( std::abs(tmp) );
     }
     std::cout << "nu = " << nu << std::endl
       //<< "log det = " << log_det << std::endl;
-              << "log_abs_det = " << log_abs_det << std::endl;
+              << "log_abs_det_nozero = " << log_abs_det_nozero << std::endl;
+
+    std::cout << "zeros: " << std::endl;
+    for(auto elem : zeros) std::cout << elem << " ";
+    std::cout << std::endl;
 
 
     // ===========================================

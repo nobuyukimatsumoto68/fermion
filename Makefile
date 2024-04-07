@@ -12,7 +12,8 @@ DIR = ./
 
 # # all: solve.o solve.o eps.o tt.o
 
-all: solve.o tt.o eps.o t_vev.o t_vev_v2.o eps_vev.o xixi.o eig.o tt_v2.o
+# all: solve.o eigen_matrix.o
+all: solve.o tt.o eps.o t_vev.o t_vev_v2.o eps_vev.o xixi.o eig.o tt_v2.o eigen_matrix.o
 # all: tt.o eps.o t_vev.o psipsi.o eig.o
 
 solve.o: solve.cu header_cuda.hpp typedefs_cuda.hpp constants.hpp
@@ -39,8 +40,8 @@ xixi.o: xixi.cc header.hpp typedefs.hpp constants.hpp
 eps.o: eps_corr.cc header.hpp typedefs.hpp constants.hpp
 	$(CXX) $< $(CXXFLAGS) $(INCLUDES) -o $(DIR)$@
 
-# eigen_matrix.o: eigen_matrix.cc header.hpp typedefs.hpp constants.hpp
-# 	$(CXX) $< $(CXXFLAGS) $(INCLUDES) -o $(DIR)$@
+eigen_matrix.o: eigen_matrix.cc header.hpp typedefs.hpp constants.hpp
+	$(CXX) $< $(CXXFLAGS) $(INCLUDES) -o $(DIR)$@
 
 
 # all: eig.o eigen_matrix.o

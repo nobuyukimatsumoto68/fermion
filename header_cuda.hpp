@@ -392,7 +392,7 @@ void multDdagger_wrapper(Complex* v, Complex* v0){
 
 
 __host__
-void multD_wrapper(Complex* v, Complex* v0){
+void multD_wrapper(Complex* v, Complex* v0, const int nu_ = nu){
   Complex *d_v, *d_v0;
 
   cudacheck(cudaMalloc(&d_v, N*CD));
@@ -401,7 +401,7 @@ void multD_wrapper(Complex* v, Complex* v0){
   cudacheck(cudaMemcpy(d_v0, v0, N*CD, H2D));
 
   set_zero<<<NBlocks, NThreadsPerBlock>>>(d_v);
-  multD<<<NBlocks, NThreadsPerBlock>>>(d_v, d_v0, nu);
+  multD<<<NBlocks, NThreadsPerBlock>>>(d_v, d_v0, nu_);
 
   cudacheck(cudaMemcpy(v, d_v, N*CD, D2H));
 

@@ -17,7 +17,7 @@
 
 
 
-int main(){
+int main(int argc, char **argv){
 
 #ifdef _OPENMP
   omp_set_num_threads( nparallel );
@@ -25,12 +25,16 @@ int main(){
 
   std::cout << std::scientific << std::setprecision(15) << std::endl;
 
-  const int nu = 3;
+  if (argc>1){
+    nu = atoi(argv[1]);
+  }
+  std::cout << "nu = " << nu << std::endl;
+  std::string description = "Lx"+std::to_string(Lx)+"Ly"+std::to_string(Ly)+"nu"+std::to_string(nu);
 
   {
     const int N = 2*Lx*Ly;
 
-    Eigen::MatrixXcd D = get_Dirac_matrix(nu);
+    Eigen::MatrixXcd D = get_Dirac_matrix();
     // std::cout << "matD0 = " << std::endl;
     // for(int j=0; j<D.rows(); j++){
     //   for(int i=0; i<D.cols(); i++){
@@ -44,31 +48,23 @@ int main(){
         if( !is_site(x,y) ) {
           vacant.push_back( idx1 );
           vacant.push_back( idx1+1 );
-          // std::cout << "debug." << std::endl;
         }
       }}
 
     std::sort(vacant.begin(),vacant.end());
-
-    std::cout << "vacant = " << std::endl;
-    for(auto elem : vacant) std::cout << elem << " ";
-    std::cout << std::endl;
 
     std::vector<std::complex<double>> D_removed;
     int idx_tot = 0;
 
     int js=0;
     for(int j=0; j<N; j++){
-      // std::cout << "! j = " << j << std::endl;
       if(j==vacant[js]){
-        // std::cout << "!! J = " << j << std::endl;
         js++;
         continue;
       }
       int is = 0;
       for(int i=0; i<N; i++){
         if(i==vacant[is]){
-          // std::cout << "i = " << i << std::endl;
           is++;
           continue;
         }
@@ -80,123 +76,108 @@ int main(){
     // std::cout << "idx_tot = " << idx_tot << std::endl;
 
     Eigen::MatrixXcd D_removed_eigen = Eigen::Map<Eigen::MatrixXcd>(&D_removed[0], N*2/3, N*2/3);
+    std::cout << "Dinv = " << std::endl
+              << D_removed_eigen.inverse() << std::endl;
     std::complex det0 = D_removed_eigen.determinant();
     std::cout << "det = " << det0 << std::endl;
     std::cout << "log(det) = " << log(det0) << std::endl;
   }
 
 
+  // std::complex det_removed = 1.0;
+  // double pf_removed = 0.0;
+  // {
+  //   Eigen::MatrixXcd matD0 = get_Dirac_matrix();
 
-  {
-    Eigen::MatrixXcd matD0 = get_Dirac_matrix( nu );
+  //   Eigen::MatrixXcd matD( 2*Lx*Ly, 2*Lx*Ly );
+  //   for(int i=0; i<2*Lx*Ly; i++){
+  //     Vect e = Eigen::VectorXcd::Zero(2*Lx*Ly);
+  //     e( i ) = 1.0;
+  //     matD.block(0, i, 2*Lx*Ly, 1) = multD_eigen(e);
+  //   }
+  //   Eigen::MatrixXcd diff = matD - matD0;
+  //   // std::cout << "diff; Eig-Mult = " << (diff*diff.adjoint()).trace() << std::endl;
 
-    Eigen::MatrixXcd matD( 2*Lx*Ly, 2*Lx*Ly );
-    for(int i=0; i<2*Lx*Ly; i++){
-      Vect e = Eigen::VectorXcd::Zero(2*Lx*Ly);
-      e( i ) = 1.0;
-      matD.block(0, i, 2*Lx*Ly, 1) = multD_eigen(e, nu);
-    }
-    Eigen::MatrixXcd diff = matD - matD0;
-    std::cout << "diff = " << (diff*diff.adjoint()).trace() << std::endl;
+  //   Eigen::MatrixXcd eps = get_large_epsilon();
+  //   Eigen::MatrixXcd A = eps*matD;
+  //   diff = A + A.transpose();
+  //   // std::cout << "diff; Asymm = " << (diff*diff.adjoint()).trace() << std::endl;
 
-    Eigen::MatrixXcd eps = get_large_epsilon();
-    Eigen::MatrixXcd A = eps*matD;
-    diff = A + A.transpose();
-    std::cout << "diff = " << (diff*diff.adjoint()).trace() << std::endl;
+  //   Eigen::ComplexEigenSolver<Eigen::MatrixXcd> ces;
+  //   ces.compute( A );
+  //   Eigen::VectorXcd ev = ces.eigenvalues();
 
-    Eigen::ComplexEigenSolver<Eigen::MatrixXcd> ces;
-    ces.compute( A );
-    Eigen::VectorXcd ev = ces.eigenvalues();
-    // std::cout << "The eigenvalues of A are:" << std:: endl
-    //           << ev << std::endl;
-    // std::cout << matD << std::endl;
 
-    int i0=0, i=0;
-    std::complex det = 1.0;
-    for(auto elem : ev ){
-      if( std::abs(elem)<1.0e-14 ){
-        i0++;
-      }
-      else{
-        i++;
-        // std::cout << "elem = " << elem << std::endl;
-        det *= elem;
-        // std::cout << "det = " << det << std::endl;
-      }
-    }
-    std::cout << "i0 = " << i0 << std::endl
-              << "i = " << i << std::endl
-              << "det = " << det << std::endl
-              << "Pf = " << std::sqrt( det.real() ) << std::endl;
-    // << "Pf/3 = " << std::pow(2,24) * std::sqrt( det.real() ) / 3.0 << std::endl;
-  }
+  //   for(auto elem : ev ) if( std::abs(elem)>1.0e-14 ) det_removed *= elem;
+  //   pf_removed = std::sqrt( det_removed.real() );
+  //   std::cout << "detR = " << det_removed << std::endl
+  //             << "PfR = " << pf_removed << std::endl;
+  // }
 
 
 
 
+  // {
+  //   const double delta = 1.0e-5;
 
-  {
-    const double delta = 1.0e-5;
+  //   auto get_det = [&](const double Mu_, const int nu_){
+  //     nu=nu_;
+  //     // Eigen::MatrixXcd eps = get_large_epsilon();
+  //     Eigen::MatrixXcd A = get_Dirac_matrix( Mu_ );
+  //     Eigen::ComplexEigenSolver<Eigen::MatrixXcd> ces;
+  //     ces.compute( A );
+  //     Eigen::VectorXcd ev = ces.eigenvalues();
 
-    std::complex detp = 1.0, detm = 1.0;
+  //     std::complex<double> res = 1.0;
+  //     for(auto elem : ev ){
+  //       if( std::abs(elem)>1.0e-14 ) res *= elem;
+  //       // else assert(false);
+  //     }
+  //     return res;
+  //   };
 
-    {
-      const double Mu = 1.0 + 0.5*delta;
-      Eigen::MatrixXcd matD0 = get_Dirac_matrix( nu );
-      Eigen::MatrixXcd eps = get_large_epsilon();
-      Eigen::MatrixXcd A = eps*matD0;
-      Eigen::ComplexEigenSolver<Eigen::MatrixXcd> ces;
-      ces.compute( A );
-      Eigen::VectorXcd ev = ces.eigenvalues();
+  //   std::complex detp1 = get_det( 1.0 + 0.5*delta, 1 );
+  //   std::complex detp2 = get_det( 1.0 + 0.5*delta, 2 );
+  //   std::complex detp3 = get_det( 1.0 + 0.5*delta, 3 );
+  //   std::complex detp4 = get_det( 1.0 + 0.5*delta, 4 );
 
-      int i0=0, i=0;
-      for(auto elem : ev ){
-        if( std::abs(elem)<1.0e-14 ){
-          i0++;
-        }
-        else{
-          i++;
-          detp *= elem;
-        }
-      }
-    }
+  //   std::complex detm1 = get_det( 1.0 - 0.5*delta, 1 );
+  //   std::complex detm2 = get_det( 1.0 - 0.5*delta, 2 );
+  //   std::complex detm3 = get_det( 1.0 - 0.5*delta, 3 );
+  //   std::complex detm4 = get_det( 1.0 - 0.5*delta, 4 );
 
-    {
-      const double Mu = 1.0 - 0.5*delta;
-      Eigen::MatrixXcd matD0 = get_Dirac_matrix( nu );
-      Eigen::MatrixXcd eps = get_large_epsilon();
-      Eigen::MatrixXcd A = eps*matD0;
-      Eigen::ComplexEigenSolver<Eigen::MatrixXcd> ces;
-      ces.compute( A );
-      Eigen::VectorXcd ev = ces.eigenvalues();
+  //   std::complex det1 = get_det( 1.0, 1 );
+  //   std::complex det2 = get_det( 1.0, 2 );
+  //   std::complex det3 = get_det( 1.0, 3 );
+  //   std::complex det4 = get_det( 1.0, 4 );
 
-      int i0=0, i=0;
-      for(auto elem : ev ){
-        if( std::abs(elem)<1.0e-14 ){
-          i0++;
-        }
-        else{
-          i++;
-          detm *= elem;
-        }
-      }
-    }
+  //   std::complex<double> Pf1p = std::sqrt( detp1.real() );
+  //   std::complex<double> Pf2p = std::sqrt( detp2.real() );
+  //   std::complex<double> Pf3p = std::sqrt( detp3.real() );
+  //   std::complex<double> Pf4p = std::sqrt( detp4.real() );
+  //   std::complex<double> Pf1m = std::sqrt( detm1.real() );
+  //   std::complex<double> Pf2m = std::sqrt( detm2.real() );
+  //   std::complex<double> Pf3m = std::sqrt( detm3.real() );
+  //   std::complex<double> Pf4m = std::sqrt( detm4.real() );
+  //   std::complex<double> Pf1 = std::sqrt( det1.real() );
+  //   std::complex<double> Pf2 = std::sqrt( det2.real() );
+  //   std::complex<double> Pf3 = std::sqrt( det3.real() );
+  //   std::complex<double> Pf4 = std::sqrt( det4.real() );
 
-    std::complex<double> Pfp = std::sqrt( detp.real() );
-    std::complex<double> Pfm = std::sqrt( detm.real() );
-    std::cout << "Pf+ = " << Pfp << std::endl;
-    std::cout << "Pf_ = " << Pfm << std::endl;
-    std::cout << "(1/V) dlog[Pf] / dMu = "
-              << (1.0/6.0)*(std::log(Pfp)-std::log(Pfm))/delta << std::endl;
-  }
-
-
-
-
-
-
-
-
+  //   std::complex<double> Zp = (Pf1p + Pf2p + Pf3p + Pf4p)*0.5;
+  //   std::complex<double> Zm = (Pf1m + Pf2m + Pf3m + Pf4m)*0.5;
+  //   std::complex<double> Z = (Pf1 + Pf2 + Pf3 + Pf4)*0.5;
+  //   std::cout << "Z = " << Z << std::endl;
+  //   // std::cout << "dlnZ = " << Z << std::endl;
+  //   // std::cout << "Z = " << Pf1 << std::endl;
+  //   // std::cout << "Z = " << Pf2 << std::endl;
+  //   // std::cout << "Z = " << Pf3 << std::endl;
+  //   // std::cout << "Z = " << Pf4 << std::endl;
+  //   // std::cout << "Pf1+ = " << Pfp << std::endl;
+  //   // std::cout << "Pf1_ = " << Pfm << std::endl;
+  //   std::cout << "(1/V) dlog[Z] / dMu = "
+  //             << (1.0/6.0)*(std::log(Zp)-std::log(Zm))/delta << std::endl;
+  // }
 
 
 
@@ -232,10 +213,11 @@ int main(){
     // double Z = 1.0;
     Eigen::MatrixXcd C;
     Eigen::MatrixXcd D00 = Eigen::MatrixXcd::Zero(2,2);
-    std::complex<double> tr, diff, Z;
+    std::complex<double> tr, diff, Z, Z1;
     double check;
     int len;
     Z = 1.0;
+    Z1 = 1.0;
 
     {
       //1
@@ -248,7 +230,7 @@ int main(){
       // assert( std::abs(diff)<1.0e-14 );
       Z += std::pow(kappa,len) * tr;
 
-      D00 += C;
+      // D00 += std::pow(kappa,len) * C;
     }
 
     {
@@ -262,7 +244,7 @@ int main(){
       // assert( std::abs(diff)<1.0e-14 );
       Z += std::pow(kappa,len) * tr;
 
-      D00 += C;
+      // D00 += std::pow(kappa,len) * C;
     }
 
     {
@@ -276,7 +258,7 @@ int main(){
       // assert( std::abs(diff)<1.0e-14 );
       Z += std::pow(kappa,len) * tr;
 
-      D00 += C;
+      // D00 += std::pow(kappa,len) * C;
     }
 
     {
@@ -291,7 +273,7 @@ int main(){
       // assert( std::abs(diff)<1.0e-14 );
       Z += std::pow(kappa,len) * tr;
 
-      D00 += C;
+      // D00 += std::pow(kappa,len) * C;
     }
 
     {
@@ -305,6 +287,9 @@ int main(){
       diff = std::pow(kappa,len) * tr - check;
       // assert( std::abs(diff)<1.0e-14 );
       Z += std::pow(kappa,len) * tr;
+
+      // D00 += std::pow(kappa,len) * C;
+      Z1 += std::pow(kappa,len) * tr;
     }
 
     {
@@ -319,7 +304,7 @@ int main(){
       // assert( std::abs(diff)<1.0e-14 );
       Z += std::pow(kappa,len) * tr;
 
-      D00 += C;
+      // D00 += std::pow(kappa,len) * C;
     }
 
     {
@@ -333,6 +318,9 @@ int main(){
       diff = std::pow(kappa,len) * tr - check;
       // assert( std::abs(diff)<1.0e-14 );
       Z += std::pow(kappa,len) * tr;
+
+      // D00 += std::pow(kappa,len) * C;
+      Z1 += std::pow(kappa,len) * tr;
     }
 
     {
@@ -347,7 +335,7 @@ int main(){
       // assert( std::abs(diff)<1.0e-14 );
       Z += std::pow(kappa,len) * tr;
 
-      D00 += C;
+      // D00 += std::pow(kappa,len) * C;
     }
 
     {
@@ -362,7 +350,7 @@ int main(){
       // assert( std::abs(diff)<1.0e-14 );
       Z += std::pow(kappa,len) * tr;
 
-      D00 += C;
+      // D00 += std::pow(kappa,len) * C;
     }
 
     {
@@ -378,7 +366,7 @@ int main(){
       // assert( std::abs(diff)<1.0e-14 );
       Z += std::pow(kappa,len) * tr;
 
-      D00 += C;
+      // D00 += std::pow(kappa,len) * C;
     }
 
     {
@@ -394,7 +382,7 @@ int main(){
       // assert( std::abs(diff)<1.0e-14 );
       Z += std::pow(kappa,len) * tr;
 
-      D00 += C;
+      // D00 += std::pow(kappa,len) * C;
     }
 
     {
@@ -409,6 +397,9 @@ int main(){
       diff = std::pow(kappa,len) * tr - special_sign*check;
       // assert( std::abs(diff)<1.0e-14 );
       Z += std::pow(kappa,len) * tr;
+
+      // D00 += std::pow(kappa,len) * C;
+      Z1 += std::pow(kappa,len) * tr;
     }
 
     {
@@ -422,7 +413,7 @@ int main(){
       // assert( std::abs(diff)<1.0e-14 );
       Z += std::pow(kappa,len) * tr;
 
-      D00 += C;
+      // D00 += std::pow(kappa,len) * C;
     }
 
     {
@@ -441,7 +432,7 @@ int main(){
       // assert( std::abs(diff)<1.0e-14 );
       Z += std::pow(kappa,len) * tr;
 
-      D00 += C;
+      // D00 += std::pow(kappa,len) * C;
     }
 
     {
@@ -455,11 +446,16 @@ int main(){
       // assert( std::abs(diff)<1.0e-14 );
       Z += std::pow(kappa,len) * tr;
 
-      D00 += C;
+      // D00 += std::pow(kappa,len) * C;
     }
 
+    std::cout << "kappa = " << kappa << std::endl;
     std::cout << "Z = " << Z << std::endl;
-    std::cout << "D00/Z = " << D00/Z << std::endl;
+    std::cout << "Z1 = " << Z1 << std::endl;
+    std::cout << "Z1/Z = " << Z1/Z << std::endl;
+    // std::cout << "Z1/Z' = " << Z1/pf_removed << std::endl;
+    // std::cout << "D00 = " << D00 << std::endl;
+    // std::cout << "D00/Z = " << D00/Z << std::endl;
   }
 
 
@@ -468,7 +464,7 @@ int main(){
     Vect Dinv1(2*Lx*Ly);
 
     {
-      std::ifstream ifs( dir_data+description+"Dinv0_cuda.dat",
+      std::ifstream ifs( dir_data+description+"Dinv_0_0_0_cuda.dat",
                          std::ios::in | std::ios::binary );
       if(!ifs) assert(false);
 
@@ -482,7 +478,7 @@ int main(){
 
 
     {
-      std::ifstream ifs( dir_data+description+"Dinv1_cuda.dat",
+      std::ifstream ifs( dir_data+description+"Dinv_0_0_1_cuda.dat",
                          std::ios::in | std::ios::binary );
       if(!ifs) assert(false);
 
@@ -513,7 +509,6 @@ int main(){
       int x=0, y=0;
       std::cout << Dinv_n_0[idx(x,y)] << std::endl;
     }
-
 
   }
 

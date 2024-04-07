@@ -246,12 +246,12 @@ M2 Wilson_projector( const int mu ){
 }
 
 
-Eigen::MatrixXcd get_Dirac_matrix (){ // const double Mu=1.0
+Eigen::MatrixXcd get_Dirac_matrix ( const double Mu=1.0 ){ //
   Eigen::MatrixXcd res = Eigen::MatrixXcd::Zero(TWO*Lx*Ly, TWO*Lx*Ly);
 
   for(int x=0; x<Lx; x++){
     for(int y=0; y<Ly; y++){
-      if( is_site(x,y) ) res.block<2,2>(2*idx(x,y), 2*idx(x,y)) = sigma[0];
+      if( is_site(x,y) ) res.block<2,2>(2*idx(x,y), 2*idx(x,y)) = Mu*sigma[0];
     }
   }
 

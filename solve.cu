@@ -20,11 +20,11 @@
 int main(int argc, char **argv){
 
   if (argc>1){
-    for (int i = 0; i < argc; i++) {
-      nu = atoi(argv[1]);
-      printf("%s\n", argv[i]);
-    }
+    nu = atoi(argv[1]);
+    // printf("%s\n", argv[i]);
   }
+  const std::string description = "Lx"+std::to_string(Lx)+"Ly"+std::to_string(Ly)+"nu"+std::to_string(nu);
+  // description = "Lx"+std::to_string(Lx)+"Ly"+std::to_string(Ly)+"nu"+std::to_string(nu);
 
   int device_num;
   cudacheck(cudaGetDeviceCount(&device_num));
