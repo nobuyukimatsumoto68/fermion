@@ -241,6 +241,56 @@ int main(int argc, char **argv){
 
   //
 
+  {
+    int xx = Lx/3, yy = Lx/3;
+
+    set2zero(e, N);
+    e[ 2*idx(xx, yy) ] = cplx(1.0);
+    multDdagger_wrapper( e, e );
+
+    set2zero(Dinv, N);
+    solve(Dinv, e);
+
+    {
+      std::ofstream of( dir_data+description+"Dinv_T_T_0_cuda.dat",
+                        std::ios::out | std::ios::binary | std::ios::trunc);
+      if(!of) assert(false);
+
+      double tmp = 0.0;
+      for(Idx i=0; i<N; i++){
+        tmp = real(Dinv[i]);
+        of.write((char*) &tmp, sizeof(double) );
+
+        tmp = imag(Dinv[i]);
+        of.write((char*) &tmp, sizeof(double) );
+      }
+    }
+
+    set2zero(e, N);
+    e[ 2*idx(xx, yy)+1] = cplx(1.0);
+    multDdagger_wrapper( e, e );
+
+    set2zero(Dinv, N);
+    solve(Dinv, e);
+
+    {
+      std::ofstream of( dir_data+description+"Dinv_T_T_1_cuda.dat",
+                        std::ios::out | std::ios::binary | std::ios::trunc);
+      if(!of) assert(false);
+
+      double tmp = 0.0;
+      for(Idx i=0; i<N; i++){
+        tmp = real(Dinv[i]);
+        of.write((char*) &tmp, sizeof(double) );
+
+        tmp = imag(Dinv[i]);
+        of.write((char*) &tmp, sizeof(double) );
+      }
+    }
+  }
+
+  //
+
   free( e );
   free( Dinv );
   cudaDeviceReset();

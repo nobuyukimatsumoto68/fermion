@@ -25,9 +25,8 @@ int main(int argc, char **argv){
 
   std::cout << std::scientific << std::setprecision(15) << std::endl;
 
-  if (argc>1){
-    nu = atoi(argv[1]);
-  }
+  if (argc>1) nu = atoi(argv[1]);
+  // if (argc>2) kappa = atoi(argv[2]);
   std::cout << "nu = " << nu << std::endl;
   std::string description = "Lx"+std::to_string(Lx)+"Ly"+std::to_string(Ly)+"nu"+std::to_string(nu);
 
@@ -76,43 +75,51 @@ int main(int argc, char **argv){
     // std::cout << "idx_tot = " << idx_tot << std::endl;
 
     Eigen::MatrixXcd D_removed_eigen = Eigen::Map<Eigen::MatrixXcd>(&D_removed[0], N*2/3, N*2/3);
-    std::cout << "Dinv = " << std::endl
-              << D_removed_eigen.inverse() << std::endl;
+    // std::cout << "Dinv = " << std::endl
+    //           << D_removed_eigen.inverse() << std::endl;
     std::complex det0 = D_removed_eigen.determinant();
     std::cout << "det = " << det0 << std::endl;
     std::cout << "log(det) = " << log(det0) << std::endl;
   }
 
 
-  // std::complex det_removed = 1.0;
-  // double pf_removed = 0.0;
-  // {
-  //   Eigen::MatrixXcd matD0 = get_Dirac_matrix();
+  std::complex<long double> det_removed = 1.0;
+  long double pf_removed = 0.0;
+  {
+    Eigen::MatrixXcd matD0 = get_Dirac_matrix();
 
-  //   Eigen::MatrixXcd matD( 2*Lx*Ly, 2*Lx*Ly );
-  //   for(int i=0; i<2*Lx*Ly; i++){
-  //     Vect e = Eigen::VectorXcd::Zero(2*Lx*Ly);
-  //     e( i ) = 1.0;
-  //     matD.block(0, i, 2*Lx*Ly, 1) = multD_eigen(e);
-  //   }
-  //   Eigen::MatrixXcd diff = matD - matD0;
-  //   // std::cout << "diff; Eig-Mult = " << (diff*diff.adjoint()).trace() << std::endl;
+    Eigen::MatrixXcd matD( 2*Lx*Ly, 2*Lx*Ly );
+    for(int i=0; i<2*Lx*Ly; i++){
+      Vect e = Eigen::VectorXcd::Zero(2*Lx*Ly);
+      e( i ) = 1.0;
+      matD.block(0, i, 2*Lx*Ly, 1) = multD_eigen(e);
+    }
+    Eigen::MatrixXcd diff = matD - matD0;
+    // std::cout << "diff; Eig-Mult = " << (diff*diff.adjoint()).trace() << std::endl;
 
-  //   Eigen::MatrixXcd eps = get_large_epsilon();
-  //   Eigen::MatrixXcd A = eps*matD;
-  //   diff = A + A.transpose();
-  //   // std::cout << "diff; Asymm = " << (diff*diff.adjoint()).trace() << std::endl;
+    Eigen::MatrixXcd eps = get_large_epsilon();
+    Eigen::MatrixXcd A = eps*matD;
+    diff = A + A.transpose();
+    // std::cout << "diff; Asymm = " << (diff*diff.adjoint()).trace() << std::endl;
 
-  //   Eigen::ComplexEigenSolver<Eigen::MatrixXcd> ces;
-  //   ces.compute( A );
-  //   Eigen::VectorXcd ev = ces.eigenvalues();
+    Eigen::ComplexEigenSolver<Eigen::MatrixXcd> ces;
+    ces.compute( A );
+    Eigen::VectorXcd ev = ces.eigenvalues();
 
-
-  //   for(auto elem : ev ) if( std::abs(elem)>1.0e-14 ) det_removed *= elem;
-  //   pf_removed = std::sqrt( det_removed.real() );
-  //   std::cout << "detR = " << det_removed << std::endl
-  //             << "PfR = " << pf_removed << std::endl;
-  // }
+    int jj = 0, kk = 0;
+    for(auto elem : ev ) {
+      if( std::abs(elem)>1.0e-14 ) {
+        det_removed *= elem;
+        kk++;
+      }
+      else jj++;
+    }
+    pf_removed = std::sqrt( det_removed.real() );
+    std::cout << "detR = " << det_removed << std::endl
+              << "PfR = " << pf_removed << std::endl;
+    std::cout << "jj = " << jj << std::endl;
+    std::cout << "kk = " << kk << std::endl;
+  }
 
 
 
@@ -209,28 +216,36 @@ int main(int argc, char **argv){
   if(nu>=3) sx = -1;
   if(nu/2==1) sy = -1;
 
+  long double kappa_ = kappa;
+
   {
     // double Z = 1.0;
     Eigen::MatrixXcd C;
     Eigen::MatrixXcd D00 = Eigen::MatrixXcd::Zero(2,2);
-    std::complex<double> tr, diff, Z, Z1;
-    double check;
+    std::complex<long double> tr, diff, Z, Z1, ZA, ZB, ZC;
+    long double check;
     int len;
     Z = 1.0;
     Z1 = 1.0;
+
+    ZA = 0.0;
+    ZB = 0.0;
+    ZC = 0.0;
 
     {
       //1
       C = R*PI*Q*RI*P*QI;
       len = 6;
       tr = -C.trace();
-      check = std::pow( kappa*std::cos(M_PI/6.0), len);
+      check = std::pow( kappa_*std::cos(M_PI/6.0), len);
 
-      diff = std::pow(kappa,len) * tr - check;
+      diff = std::pow(kappa_,len) * tr - check;
       // assert( std::abs(diff)<1.0e-14 );
-      Z += std::pow(kappa,len) * tr;
+      Z += std::pow(kappa_,len) * tr;
+      ZB += std::pow(kappa_,len-1) * tr;
+      ZC += std::pow(kappa_,len-1) * tr;
 
-      // D00 += std::pow(kappa,len) * C;
+      // D00 += std::pow(kappa_,len) * C;
     }
 
     {
@@ -238,13 +253,15 @@ int main(int argc, char **argv){
       C = R*QI*P*RI*Q*PI;
       len = 6;
       tr = -C.trace();
-      check = std::pow( kappa*std::cos(M_PI/6.0), len);
+      check = std::pow( kappa_*std::cos(M_PI/6.0), len);
 
-      diff = std::pow(kappa,len) * tr - check;
+      diff = std::pow(kappa_,len) * tr - check;
       // assert( std::abs(diff)<1.0e-14 );
-      Z += std::pow(kappa,len) * tr;
+      Z += std::pow(kappa_,len) * tr;
+      ZC += std::pow(kappa_,len-1) * tr;
+      ZA += std::pow(kappa_,len-1) * tr;
 
-      // D00 += std::pow(kappa,len) * C;
+      // D00 += std::pow(kappa_,len) * C;
     }
 
     {
@@ -252,13 +269,15 @@ int main(int argc, char **argv){
       C = P*RI*Q*PI*R*QI;
       len = 6;
       tr = -C.trace();
-      check = std::pow( kappa*std::cos(M_PI/6.0), len);
+      check = std::pow( kappa_*std::cos(M_PI/6.0), len);
 
-      diff = std::pow(kappa,len) * tr - check;
+      diff = std::pow(kappa_,len) * tr - check;
       // assert( std::abs(diff)<1.0e-14 );
-      Z += std::pow(kappa,len) * tr;
+      Z += std::pow(kappa_,len) * tr;
+      ZA += std::pow(kappa_,len-1) * tr;
+      ZB += std::pow(kappa_,len-1) * tr;
 
-      // D00 += std::pow(kappa,len) * C;
+      // D00 += std::pow(kappa_,len) * C;
     }
 
     {
@@ -267,13 +286,15 @@ int main(int argc, char **argv){
       // C = R*PI*R*QI;
       len = 4;
       tr = -C.trace();
-      check = std::pow( kappa*std::cos(M_PI/6.0), len);
+      check = std::pow( kappa_*std::cos(M_PI/6.0), len);
 
-      diff = std::pow(kappa,len) * tr - check;
+      diff = std::pow(kappa_,len) * tr - check;
       // assert( std::abs(diff)<1.0e-14 );
-      Z += std::pow(kappa,len) * tr;
+      Z += std::pow(kappa_,len) * tr;
+      ZB += std::pow(kappa_,len-1) * tr;
+      ZC += std::pow(kappa_,len-1) * tr;
 
-      // D00 += std::pow(kappa,len) * C;
+      // D00 += std::pow(kappa_,len) * C;
     }
 
     {
@@ -282,14 +303,14 @@ int main(int argc, char **argv){
       // C = QI*R*PI*R;
       len = 4;
       tr = -C.trace();
-      check = std::pow( kappa*std::cos(M_PI/6.0), len);
+      check = std::pow( kappa_*std::cos(M_PI/6.0), len);
 
-      diff = std::pow(kappa,len) * tr - check;
+      diff = std::pow(kappa_,len) * tr - check;
       // assert( std::abs(diff)<1.0e-14 );
-      Z += std::pow(kappa,len) * tr;
+      Z += std::pow(kappa_,len) * tr;
 
-      // D00 += std::pow(kappa,len) * C;
-      Z1 += std::pow(kappa,len) * tr;
+      // D00 += std::pow(kappa_,len) * C;
+      Z1 += std::pow(kappa_,len) * tr;
     }
 
     {
@@ -298,13 +319,15 @@ int main(int argc, char **argv){
       // C = R*QI*R*PI;
       len = 4;
       tr = -C.trace();
-      check = std::pow( kappa*std::cos(M_PI/6.0), len);
+      check = std::pow( kappa_*std::cos(M_PI/6.0), len);
 
-      diff = std::pow(kappa,len) * tr - check;
+      diff = std::pow(kappa_,len) * tr - check;
       // assert( std::abs(diff)<1.0e-14 );
-      Z += std::pow(kappa,len) * tr;
+      Z += std::pow(kappa_,len) * tr;
+      ZA += std::pow(kappa_,len-1) * tr;
+      ZC += std::pow(kappa_,len-1) * tr;
 
-      // D00 += std::pow(kappa,len) * C;
+      // D00 += std::pow(kappa_,len) * C;
     }
 
     {
@@ -313,14 +336,14 @@ int main(int argc, char **argv){
       // C = PI*R*PI*Q;
       len = 4;
       tr = -C.trace();
-      check = std::pow( kappa*std::cos(M_PI/6.0), len);
+      check = std::pow( kappa_*std::cos(M_PI/6.0), len);
 
-      diff = std::pow(kappa,len) * tr - check;
+      diff = std::pow(kappa_,len) * tr - check;
       // assert( std::abs(diff)<1.0e-14 );
-      Z += std::pow(kappa,len) * tr;
+      Z += std::pow(kappa_,len) * tr;
 
-      // D00 += std::pow(kappa,len) * C;
-      Z1 += std::pow(kappa,len) * tr;
+      // D00 += std::pow(kappa_,len) * C;
+      Z1 += std::pow(kappa_,len) * tr;
     }
 
     {
@@ -329,13 +352,15 @@ int main(int argc, char **argv){
       // C = P*RI*P*QI;
       len = 4;
       tr = -C.trace();
-      check = std::pow( kappa*std::cos(M_PI/6.0), len);
+      check = std::pow( kappa_*std::cos(M_PI/6.0), len);
 
-      diff = std::pow(kappa,len) * tr - check;
+      diff = std::pow(kappa_,len) * tr - check;
       // assert( std::abs(diff)<1.0e-14 );
-      Z += std::pow(kappa,len) * tr;
+      Z += std::pow(kappa_,len) * tr;
+      ZA += std::pow(kappa_,len-1) * tr;
+      ZB += std::pow(kappa_,len-1) * tr;
 
-      // D00 += std::pow(kappa,len) * C;
+      // D00 += std::pow(kappa_,len) * C;
     }
 
     {
@@ -344,13 +369,15 @@ int main(int argc, char **argv){
       // C = R*PI*Q*PI;
       len = 4;
       tr = -C.trace();
-      check = std::pow( kappa*std::cos(M_PI/6.0), len);
+      check = std::pow( kappa_*std::cos(M_PI/6.0), len);
 
-      diff = std::pow(kappa,len) * tr - check;
+      diff = std::pow(kappa_,len) * tr - check;
       // assert( std::abs(diff)<1.0e-14 );
-      Z += std::pow(kappa,len) * tr;
+      Z += std::pow(kappa_,len) * tr;
+      ZC += std::pow(kappa_,len-1) * tr;
+      ZA += std::pow(kappa_,len-1) * tr;
 
-      // D00 += std::pow(kappa,len) * C;
+      // D00 += std::pow(kappa_,len) * C;
     }
 
     {
@@ -358,15 +385,17 @@ int main(int argc, char **argv){
       C = sx*sy*R*QI*P*QI;
       len = 4;
       tr = -C.trace();
-      check = std::pow( kappa*std::cos(M_PI/6.0), len);
+      check = std::pow( kappa_*std::cos(M_PI/6.0), len);
 
       int special_sign = -1.0;
 
-      diff = std::pow(kappa,len) * tr - special_sign*check;
+      diff = std::pow(kappa_,len) * tr - special_sign*check;
       // assert( std::abs(diff)<1.0e-14 );
-      Z += std::pow(kappa,len) * tr;
+      Z += std::pow(kappa_,len) * tr;
+      ZB += std::pow(kappa_,len-1) * tr;
+      ZC += std::pow(kappa_,len-1) * tr;
 
-      // D00 += std::pow(kappa,len) * C;
+      // D00 += std::pow(kappa_,len) * C;
     }
 
     {
@@ -374,15 +403,17 @@ int main(int argc, char **argv){
       C = sx*sy*P*QI*R*QI;
       len = 4;
       tr = -C.trace();
-      check = std::pow( kappa*std::cos(M_PI/6.0), len);
+      check = std::pow( kappa_*std::cos(M_PI/6.0), len);
 
       int special_sign = -1.0;
 
-      diff = std::pow(kappa,len) * tr - special_sign*check;
+      diff = std::pow(kappa_,len) * tr - special_sign*check;
       // assert( std::abs(diff)<1.0e-14 );
-      Z += std::pow(kappa,len) * tr;
+      Z += std::pow(kappa_,len) * tr;
+      ZA += std::pow(kappa_,len-1) * tr;
+      ZB += std::pow(kappa_,len-1) * tr;
 
-      // D00 += std::pow(kappa,len) * C;
+      // D00 += std::pow(kappa_,len) * C;
     }
 
     {
@@ -390,16 +421,16 @@ int main(int argc, char **argv){
       C = sx*sy*PI*Q*RI*Q;
       len = 4;
       tr = -C.trace();
-      check = std::pow( kappa*std::cos(M_PI/6.0), len);
+      check = std::pow( kappa_*std::cos(M_PI/6.0), len);
 
       int special_sign = -1.0;
 
-      diff = std::pow(kappa,len) * tr - special_sign*check;
+      diff = std::pow(kappa_,len) * tr - special_sign*check;
       // assert( std::abs(diff)<1.0e-14 );
-      Z += std::pow(kappa,len) * tr;
+      Z += std::pow(kappa_,len) * tr;
 
-      // D00 += std::pow(kappa,len) * C;
-      Z1 += std::pow(kappa,len) * tr;
+      // D00 += std::pow(kappa_,len) * C;
+      Z1 += std::pow(kappa_,len) * tr;
     }
 
     {
@@ -407,13 +438,15 @@ int main(int argc, char **argv){
       C = sx*R*QI*R*QI*R*QI;
       len = 6;
       tr = -C.trace();
-      check = std::pow( kappa*std::cos(M_PI/6.0), len);
+      check = std::pow( kappa_*std::cos(M_PI/6.0), len);
 
-      diff = std::pow(kappa,len) * tr - check;
+      diff = std::pow(kappa_,len) * tr - check;
       // assert( std::abs(diff)<1.0e-14 );
-      Z += std::pow(kappa,len) * tr;
+      Z += std::pow(kappa_,len) * tr;
+      ZB += std::pow(kappa_,len-1) * tr;
+      ZC += std::pow(kappa_,len-1) * tr;
 
-      // D00 += std::pow(kappa,len) * C;
+      // D00 += std::pow(kappa_,len) * C;
     }
 
     {
@@ -421,18 +454,20 @@ int main(int argc, char **argv){
       C = sx*sy*R*PI*R*PI*R*PI;
       len = 6;
       tr = -C.trace();
-      check = std::pow( kappa*std::cos(M_PI/6.0), len);
+      check = std::pow( kappa_*std::cos(M_PI/6.0), len);
 
       int special_sign = -1.0;
 
-      diff = std::pow(kappa,len) * tr - special_sign*check;
-      // std::cout << "mtr = " << std::pow(kappa,len) * tr << std::endl
+      diff = std::pow(kappa_,len) * tr - special_sign*check;
+      // std::cout << "mtr = " << std::pow(kappa_,len) * tr << std::endl
       //           << "ch = " << special_sign*check << std::endl;
 
       // assert( std::abs(diff)<1.0e-14 );
-      Z += std::pow(kappa,len) * tr;
+      Z += std::pow(kappa_,len) * tr;
+      ZC += std::pow(kappa_,len-1) * tr;
+      ZA += std::pow(kappa_,len-1) * tr;
 
-      // D00 += std::pow(kappa,len) * C;
+      // D00 += std::pow(kappa_,len) * C;
     }
 
     {
@@ -440,20 +475,29 @@ int main(int argc, char **argv){
       C = sy*P*QI*P*QI*P*QI;
       len = 6;
       tr = -C.trace();
-      check = std::pow( kappa*std::cos(M_PI/6.0), len);
+      check = std::pow( kappa_*std::cos(M_PI/6.0), len);
 
-      diff = std::pow(kappa,len) * tr - check;
+      diff = std::pow(kappa_,len) * tr - check;
       // assert( std::abs(diff)<1.0e-14 );
-      Z += std::pow(kappa,len) * tr;
+      Z += std::pow(kappa_,len) * tr;
+      ZA += std::pow(kappa_,len-1) * tr;
+      ZB += std::pow(kappa_,len-1) * tr;
 
-      // D00 += std::pow(kappa,len) * C;
+      // D00 += std::pow(kappa_,len) * C;
     }
 
-    std::cout << "kappa = " << kappa << std::endl;
+    std::cout << "kappa_ = " << kappa_ << std::endl;
     std::cout << "Z = " << Z << std::endl;
     std::cout << "Z1 = " << Z1 << std::endl;
+    std::cout << "ZA = " << ZA << std::endl;
+    std::cout << "ZB = " << ZB << std::endl;
+    std::cout << "ZC = " << ZC << std::endl;
     std::cout << "Z1/Z = " << Z1/Z << std::endl;
-    // std::cout << "Z1/Z' = " << Z1/pf_removed << std::endl;
+    std::cout << "ZA/Z = " << ZA/Z << std::endl;
+    std::cout << "ZB/Z = " << ZB/Z << std::endl;
+    std::cout << "ZC/Z = " << ZC/Z << std::endl;
+    std::cout << "pf_removed = " << pf_removed << std::endl;
+    std::cout << "Z1/Z' = " << Z1/pf_removed << std::endl;
     // std::cout << "D00 = " << D00 << std::endl;
     // std::cout << "D00/Z = " << D00/Z << std::endl;
   }
@@ -514,7 +558,19 @@ int main(int argc, char **argv){
 
 
 
-
+  {
+    std::cout << "zero mode." << std::endl;
+    Eigen::MatrixXcd matD0 = get_Dirac_matrix();
+    Vect e = Eigen::VectorXcd::Zero(2*Lx*Ly);
+    // for(int i=0; i<2*Lx*Ly; i++) e( i ) = 1.0;
+    for(int i=0; i<Lx*Ly; i++) e( 2*i+1 ) = 1.0;
+    std::cout << "De0 = " << std::endl;
+    auto v1 = matD0 * e;
+    std::cout << v1 << std::endl;
+    std::cout << v1.norm() << std::endl;
+    std::cout << "Ddag e0 = " << std::endl;
+    std::cout << matD0.adjoint() * e << std::endl;
+  }
 
 
 

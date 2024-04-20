@@ -51,7 +51,8 @@ Pauli get_Pauli() {
 }
 
 
-Idx idx(const int x, const int y){ return x + Lx*y; }
+// Idx idx(const int x, const int y){ return x + Lx*y; }
+Idx idx(const int x, const int y){ return (x+Lx)%Lx + Lx * ((y+Ly)%Ly); }
 
 
 int cshift(int& xp, int& yp, const int x, const int y, const int mu){
@@ -360,7 +361,7 @@ Vect A(const Vect& v){
 
 Vect CG(const Vect& init,
         const Vect& b,
-        const double TOL=1.0e-15,
+        const double TOL=1.0e-13,
         const int MAXITER=1e5
         ){
   Vect x = init; //Vect::Zero(ops.size);
@@ -381,6 +382,9 @@ Vect CG(const Vect& init,
       const Vect q = A(p);
       const Complex gam = p.dot(q);
       const Complex al = mu/gam;
+      // std::cout << "debug. iter = " << k << std::endl;
+      // std::cout << "debug. x = " << x.transpose() << std::endl;
+      // std::cout << "debug. p = " << p.transpose() << std::endl;
       x += al*p;
       r -= al*q;
       mu = r.squaredNorm();

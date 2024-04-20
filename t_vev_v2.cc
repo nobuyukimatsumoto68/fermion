@@ -17,13 +17,17 @@
 
 
 
-int main(){
 
+int main(int argc, char **argv){
 #ifdef _OPENMP
   omp_set_dynamic(0);
   omp_set_num_threads( nparallel );
 #endif
 
+  if (argc>1){
+    nu = atoi(argv[1]);
+    // printf("%s\n", argv[i]);
+  }
   const std::string description = "Lx"+std::to_string(Lx)+"Ly"+std::to_string(Ly)+"nu"+std::to_string(nu);
 
   std::vector<M2> Dinv_n_0(Lx*Ly), Dinv_n_A(Lx*Ly), Dinv_n_B(Lx*Ly), Dinv_n_C(Lx*Ly);

@@ -12,18 +12,18 @@ const int TWO = 2;
 const int THREE = 3;
 const int SIX = 6;
 
-int nu = 1; // 1,2,3,4 // PP, PA, AA, AP // xy
+int nu = 3; // 1,2,3,4 // PP, PA, AA, AP // xy
 // PP, PA, AA, AP
 
 const double m = 0.0;
 
-const unsigned long Lx = 3 * 1;
-const unsigned long Ly = 3 * 1;
+const unsigned long Lx = 6 * 8;
+const unsigned long Ly = Lx/2;
 
 // -------------------
 
-// const unsigned long Lx = 6 * 1;
-// const unsigned long Ly = 6 * 2;
+// const unsigned long Lx = 9;
+// const unsigned long Ly = 12;
 
 // const unsigned long Lx = 6 * 2;
 // const unsigned long Ly = 6 * 4;
@@ -89,14 +89,14 @@ const unsigned long Ly = 3 * 1;
 // const unsigned long Ly = 6 * 1024;
 
 const double alat = 0.01; // ell
-const int nparallel = 1;
+const int nparallel = 12;
 
 // const double Vy = 3.0*sqrt(3.0)/4.0 * alat*alat;
 const double my = m + 2.0/3.0 * 3.0/alat;
 
 // const double Mu = 1.0;
 // double Mu = 1.0;
-const double kappa = 0.5;
+const long double kappa = 2.0/3.0;
 // const double kappa = (2.0/3.0) * 2.0 / alat / my;
 // const double kappa = 0.0;
 
