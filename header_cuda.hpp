@@ -23,6 +23,153 @@
 #define CD (sizeof(Complex))
 #define cuI ( make_cuDoubleComplex(0.0,1.0) )
 
+__constant__ double d_kappa[3]; //  = {kappa[0], kappa[1], kappa[2]};
+
+__constant__ double d_e0[2];
+__constant__ double d_e1[2];
+__constant__ double d_e2[2];
+// __constant__ int d_nu = nu;
+// __constant__ int d_nu[3];
+
+
+__host__
+void cudacheck( cudaError status ){
+  if(status!=0) std::cout << status << std::endl;
+  assert(cudaSuccess == status);
+}
+
+
+__host__
+void set_ell(){
+  ell0[0] = 1.0;
+  ell0[1] = 0.0;
+
+  ell2[0] = -omega[0];
+  ell2[1] = -omega[1];
+
+  ell1[0] = -ell2[0] - ell0[0];
+  ell1[1] = -ell2[1] - ell0[1];
+
+  ell[0] = std::sqrt( ell0[0]*ell0[0] + ell0[1]*ell0[1] );
+  ell[1] = std::sqrt( ell1[0]*ell1[0] + ell1[1]*ell1[1] );
+  ell[2] = std::sqrt( ell2[0]*ell2[0] + ell2[1]*ell2[1] );
+}
+
+
+__host__
+void set_kappa(){
+  kappa[0] = 2.0*ell[0] / (ell[0] + ell[1] + ell[2]);
+  kappa[1] = 2.0*ell[1] / (ell[0] + ell[1] + ell[2]);
+  kappa[2] = 2.0*ell[2] / (ell[0] + ell[1] + ell[2]);
+
+  cudacheck( cudaMemcpyToSymbol(d_kappa, kappa, 3*sizeof(DB)) );
+}
+
+
+__host__
+void set_ell_star(){
+  const double s = 0.5 * (ell[0]+ell[1]+ell[2]);
+  const double area = std::sqrt( s*(s-ell[0])*(s-ell[1])*(s-ell[2]) );
+
+  double coeff;
+  coeff = 0.25 * (ell[1]*ell[1] + ell[2]*ell[2] - ell[0]*ell[0]) / area;
+  ell_star0[1] = -ell0[1] * coeff;
+  ell_star0[0] = -ell0[0] * coeff;
+  // ell_star0[0] =  ell0[1] * coeff;
+  // ell_star0[1] = -ell0[0] * coeff;
+
+  coeff = 0.25 * (ell[2]*ell[2] + ell[0]*ell[0] - ell[1]*ell[1]) / area;
+  ell_star1[1] = -ell1[1] * coeff;
+  ell_star1[0] = -ell1[0] * coeff;
+  // ell_star1[0] =  ell1[1] * coeff;
+  // ell_star1[1] = -ell1[0] * coeff;
+
+  coeff = 0.25 * (ell[0]*ell[0] + ell[1]*ell[1] - ell[2]*ell[2]) / area;
+  ell_star2[1] = -ell2[1] * coeff;
+  ell_star2[0] = -ell2[0] * coeff;
+  // ell_star2[0] =  ell2[1] * coeff;
+  // ell_star2[1] = -ell2[0] * coeff;
+}
+
+
+__host__
+void set_e(){
+  double len;
+
+  len = std::sqrt( ell_star0[0]*ell_star0[0] + ell_star0[1]*ell_star0[1] );
+  e0[0] = ell_star0[0]/len;
+  e0[1] = ell_star0[1]/len;
+
+  len = std::sqrt( ell_star1[0]*ell_star1[0] + ell_star1[1]*ell_star1[1] );
+  e1[0] = ell_star1[0]/len;
+  e1[1] = ell_star1[1]/len;
+
+  len = std::sqrt( ell_star2[0]*ell_star2[0] + ell_star2[1]*ell_star2[1] );
+  e2[0] = ell_star2[0]/len;
+  e2[1] = ell_star2[1]/len;
+
+  cudacheck( cudaMemcpyToSymbol(d_e0, e0, 2*sizeof(DB)) );
+  cudacheck( cudaMemcpyToSymbol(d_e1, e1, 2*sizeof(DB)) );
+  cudacheck( cudaMemcpyToSymbol(d_e2, e2, 2*sizeof(DB)) );
+}
+
+
+__host__
+void set_all(){
+  set_ell();
+  set_kappa();
+  set_ell_star();
+  set_e();
+}
+
+
+__device__
+void get_e( double* res, const int mu ){
+  if(mu==0){
+    // res[0] = -1.0;
+    // res[1] = 0.0;
+    res[0] = d_e0[0];
+    res[1] = d_e0[1];
+  }
+  else if(mu==1){
+    // res[0] = 0.5;
+    // res[1] = -0.5*sqrt(3.0);
+    res[0] = d_e1[0];
+    res[1] = d_e1[1];
+  }
+  else if(mu==2){
+    // res[0] = 0.5;
+    // res[1] = 0.5*sqrt(3.0);
+    res[0] = d_e2[0];
+    res[1] = d_e2[1];
+  }
+  else if(mu==3){
+    // res[0] = 1.0;
+    // res[1] = 0.0;
+    res[0] = -d_e0[0];
+    res[1] = -d_e0[1];
+  }
+  else if(mu==4){
+    // res[0] = -0.5;
+    // res[1] = 0.5*sqrt(3.0);
+    res[0] = -d_e1[0];
+    res[1] = -d_e1[1];
+  }
+  else if(mu==5){
+    // res[0] = -0.5;
+    // res[1] = -0.5*sqrt(3.0);
+    res[0] = -d_e2[0];
+    res[1] = -d_e2[1];
+  }
+  else assert(false);
+}
+
+
+
+
+
+
+
 
 __device__ __host__
 Complex cplx(const double c) { return make_cuDoubleComplex(c, 0.0); }
@@ -49,12 +196,6 @@ __device__ __host__ inline Complex conj(Complex c ){ return cuConj(c); }
 
 
 
-
-__host__
-void cudacheck( cudaError status ){
-  if(status!=0) std::cout << status << std::endl;
-  assert(cudaSuccess == status);
-}
 
 
 __host__
@@ -130,10 +271,10 @@ int cshift(int& xp, int& yp, const int x, const int y, const int mu, const int n
 
     if(x==Lx-1 && nu_>=3) res *= -1;
     if(y==0 && nu_/2==1) {
-      // if(is_periodic_orthogonal) {
-      //   if(xp-Ly/2<0) res *= -1;
-      //   xp=mod(xp-int(Ly/2),Lx);
-      // }
+      if(is_periodic_orthogonal) {
+        if(xp-Ly/2<0) res *= -1;
+        xp=mod(xp-int(Ly/2),Lx);
+      }
       res *= -1;
     }
   }
@@ -142,10 +283,10 @@ int cshift(int& xp, int& yp, const int x, const int y, const int mu, const int n
     yp=mod(y+1,Ly);
 
     if(y==Ly-1 && nu_/2==1) {
-      // if(is_periodic_orthogonal) {
-      //   if(Lx<=xp+Ly/2) res *= -1;
-      //   xp=mod(xp+int(Ly/2),Lx);
-      // }
+      if(is_periodic_orthogonal) {
+        if(Lx<=xp+Ly/2) res *= -1;
+        xp=mod(xp+int(Ly/2),Lx);
+      }
       res *= -1;
     }
   }
@@ -161,10 +302,10 @@ int cshift(int& xp, int& yp, const int x, const int y, const int mu, const int n
 
     if(x==0 && nu_>=3) res *= -1;
     if(y==Ly-1 && nu_/2==1) {
-      // if(is_periodic_orthogonal) {
-      //   if(Lx<=xp+Ly/2) res *= -1;
-      //   xp=mod(xp+int(Ly/2),Lx);
-      // }
+      if(is_periodic_orthogonal) {
+        if(Lx<=xp+Ly/2) res *= -1;
+        xp=mod(xp+int(Ly/2),Lx);
+      }
       res *= -1;
     }
   }
@@ -173,10 +314,10 @@ int cshift(int& xp, int& yp, const int x, const int y, const int mu, const int n
     yp=mod(y-1,Ly);
 
     if(y==0 && nu_/2==1 ) {
-      // if(is_periodic_orthogonal) {
-      //   if(xp-Ly/2<0) res *= -1;
-      //   xp=mod(xp-int(Ly/2),Lx);
-      // }
+      if(is_periodic_orthogonal) {
+        if(xp-Ly/2<0) res *= -1;
+        xp=mod(xp-int(Ly/2),Lx);
+      }
       res *= -1;
     }
   }
@@ -201,10 +342,10 @@ int cshift_minus(int& xp, int& yp, const int x, const int y, const int mu, const
 
     if(x==0 && nu_>=3) res *= -1;
     if(y==Ly-1 && nu_/2==1) {
-      // if(is_periodic_orthogonal) {
-      //   if(Lx<=xp+Ly/2) res *= -1;
-      //   xp=mod(xp+int(Ly/2),Lx);
-      // }
+      if(is_periodic_orthogonal) {
+        if(Lx<=xp+Ly/2) res *= -1;
+        xp=mod(xp+int(Ly/2),Lx);
+      }
       res *= -1;
     }
   }
@@ -213,10 +354,10 @@ int cshift_minus(int& xp, int& yp, const int x, const int y, const int mu, const
     yp=mod(y-1,Ly);
 
     if(y==0 && nu_/2==1) {
-      // if(is_periodic_orthogonal) {
-      //   if(xp-Ly/2<0) res *= -1;
-      //   xp=mod(xp-int(Ly/2),Lx);
-      // }
+      if(is_periodic_orthogonal) {
+        if(xp-Ly/2<0) res *= -1;
+        xp=mod(xp-int(Ly/2),Lx);
+      }
       res *= -1;
     }
   }
@@ -232,10 +373,10 @@ int cshift_minus(int& xp, int& yp, const int x, const int y, const int mu, const
 
     if(x==Lx-1 && nu_>=3) res *= -1;
     if(y==0 && nu_/2==1) {
-      // if(is_periodic_orthogonal) {
-      //   if(xp-Ly/2<0) res *= -1;
-      //   xp=mod(xp-int(Ly/2),Lx);
-      // }
+      if(is_periodic_orthogonal) {
+        if(xp-Ly/2<0) res *= -1;
+        xp=mod(xp-int(Ly/2),Lx);
+      }
       res *= -1;
     }
   }
@@ -244,10 +385,10 @@ int cshift_minus(int& xp, int& yp, const int x, const int y, const int mu, const
     yp=mod(y+1,Ly);
 
     if(y==Ly-1 && nu_/2==1) {
-      // if(is_periodic_orthogonal) {
-      //   if(Lx<=xp+Ly/2) res *= -1;
-      //   xp=mod(xp+int(Ly/2),Lx);
-      // }
+      if(is_periodic_orthogonal) {
+        if(Lx<=xp+Ly/2) res *= -1;
+        xp=mod(xp+int(Ly/2),Lx);
+      }
       res *= -1;
     }
   }
@@ -256,35 +397,6 @@ int cshift_minus(int& xp, int& yp, const int x, const int y, const int mu, const
   return res;
 }
 
-
-__device__
-void get_e( double* res, const int mu ){
-  if(mu==0){
-    res[0] = -1.0;
-    res[1] = 0.0;
-  }
-  else if(mu==1){
-    res[0] = 0.5;
-    res[1] = -0.5*sqrt(3.0);
-  }
-  else if(mu==2){
-    res[0] = 0.5;
-    res[1] = 0.5*sqrt(3.0);
-  }
-  else if(mu==3){
-    res[0] = 1.0;
-    res[1] = 0.0;
-  }
-  else if(mu==4){
-    res[0] = -0.5;
-    res[1] = 0.5*sqrt(3.0);
-  }
-  else if(mu==5){
-    res[0] = -0.5;
-    res[1] = -0.5*sqrt(3.0);
-  }
-  else assert(false);
-}
 
 
 
@@ -315,6 +427,7 @@ void Wilson_projector( Complex* res, const int mu){
 __global__
 void multD ( Complex* res, const Complex* v, const int nu_ ){
   Idx i = blockIdx.x*blockDim.x + threadIdx.x;
+
   if(i<M) {
     int x,y;
     get_xy(x,y,i);
@@ -333,8 +446,8 @@ void multD ( Complex* res, const Complex* v, const int nu_ ){
         Complex P[4];
         Wilson_projector( P, mu );
 
-        res[2*i] = res[2*i] - sign * kappa * (P[0]*v[idx2] + P[1]*v[idx2+1]);
-        res[2*i+1] = res[2*i+1] - sign * kappa * (P[2]*v[idx2] + P[3]*v[idx2+1]);
+        res[2*i] = res[2*i] - sign * d_kappa[mu%3] * (P[0]*v[idx2] + P[1]*v[idx2+1]);
+        res[2*i+1] = res[2*i+1] - sign * d_kappa[mu%3] * (P[2]*v[idx2] + P[3]*v[idx2+1]);
       }
     }
   }
@@ -345,6 +458,9 @@ void multD ( Complex* res, const Complex* v, const int nu_ ){
 __global__
 void multDdagger ( Complex* res, const Complex* v, const int nu_ ){
   Idx i = blockIdx.x*blockDim.x + threadIdx.x;
+
+  // const double kappa_[3] = {kappa0, kappa1, kappa2};
+
   if(i<M){
     int x,y;
     get_xy(x,y,i);
@@ -363,8 +479,8 @@ void multDdagger ( Complex* res, const Complex* v, const int nu_ ){
         Complex P[4];
         Wilson_projector( P, mu );
 
-        res[2*i] = res[2*i] - sign * kappa * (P[0]*v[idx2] + P[1]*v[idx2+1]);
-        res[2*i+1] = res[2*i+1] - sign * kappa * (P[2]*v[idx2] + P[3]*v[idx2+1]);
+        res[2*i] = res[2*i] - sign * d_kappa[mu%3] * (P[0]*v[idx2] + P[1]*v[idx2+1]);
+        res[2*i+1] = res[2*i+1] - sign * d_kappa[mu%3] * (P[2]*v[idx2] + P[3]*v[idx2+1]);
       }
     }
   }
@@ -373,32 +489,39 @@ void multDdagger ( Complex* res, const Complex* v, const int nu_ ){
 
 
 __host__
-void multDdagger_wrapper(Complex* v, Complex* v0){
+void multDdagger_wrapper(Complex* v, Complex* v0, const int nu_=nu){
   Complex *d_v, *d_v0;
 
   cudacheck(cudaMalloc(&d_v, N*CD));
   cudacheck(cudaMalloc(&d_v0, N*CD));
+  // int *d_nu;
+  // cudacheck(cudaMalloc(&d_nu, sizeof(int)));
 
   cudacheck(cudaMemcpy(d_v0, v0, N*CD, H2D));
+  // cudacheck(cudaMemcpy(d_nu, nu_, sizeof(int), H2D));
 
   set_zero<<<NBlocks, NThreadsPerBlock>>>(d_v);
-  multDdagger<<<NBlocks, NThreadsPerBlock>>>(d_v, d_v0, nu);
+  multDdagger<<<NBlocks, NThreadsPerBlock>>>(d_v, d_v0, nu_);
 
   cudacheck(cudaMemcpy(v, d_v, N*CD, D2H));
 
   cudacheck(cudaFree(d_v));
   cudacheck(cudaFree(d_v0));
+  // cudacheck(cudaFree(d_nu));
 }
 
 
 __host__
-void multD_wrapper(Complex* v, Complex* v0, const int nu_ = nu){
+void multD_wrapper(Complex* v, Complex* v0, const int nu_=nu){
   Complex *d_v, *d_v0;
 
   cudacheck(cudaMalloc(&d_v, N*CD));
   cudacheck(cudaMalloc(&d_v0, N*CD));
+  // int *d_nu;
+  // cudacheck(cudaMalloc(&d_nu, sizeof(int)));
 
   cudacheck(cudaMemcpy(d_v0, v0, N*CD, H2D));
+  // cudacheck(cudaMemcpy(d_nu, nu_, sizeof(int), H2D));
 
   set_zero<<<NBlocks, NThreadsPerBlock>>>(d_v);
   multD<<<NBlocks, NThreadsPerBlock>>>(d_v, d_v0, nu_);
@@ -407,18 +530,19 @@ void multD_wrapper(Complex* v, Complex* v0, const int nu_ = nu){
 
   cudacheck(cudaFree(d_v));
   cudacheck(cudaFree(d_v0));
+  // cudacheck(cudaFree(d_nu));
 }
 
 
 
 
 __host__
-void multA(Complex* d_v, Complex* d_tmp, Complex* d_v0){
+void multA(Complex* d_v, Complex* d_tmp, Complex* d_v0, const int nu_){
   set_zero<<<NBlocks, NThreadsPerBlock>>>(d_tmp);
-  multD<<<NBlocks, NThreadsPerBlock>>>(d_tmp, d_v0, nu);
+  multD<<<NBlocks, NThreadsPerBlock>>>(d_tmp, d_v0, nu_);
 
   set_zero<<<NBlocks, NThreadsPerBlock>>>(d_v);
-  multDdagger<<<NBlocks, NThreadsPerBlock>>>(d_v, d_tmp, nu);
+  multDdagger<<<NBlocks, NThreadsPerBlock>>>(d_v, d_tmp, nu_);
 }
 
 
@@ -471,10 +595,14 @@ void dot2self_normalized_wrapper(double& scalar, Complex* d_scalar, Complex* d_p
   cudacheck(cudaMemcpy(d_scalar, &dummy, CD, H2D));
   dot_normalized<<<NBlocks, NThreadsPerBlock>>>(d_scalar, d_p, d_p);
   cudacheck(cudaMemcpy(&dummy, d_scalar, CD, D2H));
-  assert( abs( imag(dummy)<1.0e-14 ) );
+  assert( abs( imag(dummy)<1.0e-13 ) );
   scalar = real(dummy);
 }
 
+// __host__
+// void set_kappa(){
+//   cudacheck(cudaMemcpy(d_kappa, kappa, DB, H2D));
+// }
 
 
 __host__
@@ -489,6 +617,9 @@ void solve(Complex x[N], Complex b[N],
 
   Complex *d_scalar;
   cudacheck(cudaMalloc(&d_scalar, CD));
+
+  // cudacheck(cudaMalloc(&d_nu, sizeof(int)));
+  // cudacheck(cudaMemcpy(d_nu, nu, sizeof(int), H2D));
 
   set_zero<<<NBlocks, NThreadsPerBlock>>>(d_x);
   cudacheck(cudaMemcpy(d_r, b, N*CD, H2D));
@@ -508,7 +639,7 @@ void solve(Complex x[N], Complex b[N],
     Complex gam;
 
     for(; k<maxiter; ++k){
-      multA(d_q, d_tmp, d_p);
+      multA(d_q, d_tmp, d_p, nu);
 
       dot_normalized_wrapper(gam, d_scalar, d_p, d_q);
 
@@ -546,5 +677,6 @@ void solve(Complex x[N], Complex b[N],
   cudacheck(cudaFree(d_q));
   cudacheck(cudaFree(d_tmp));
   cudacheck(cudaFree(d_scalar));
+  // cudacheck(cudaFree(d_nu));
 }
 

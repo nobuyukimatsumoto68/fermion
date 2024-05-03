@@ -26,6 +26,8 @@ int main(int argc, char **argv){
   const std::string description = "Lx"+std::to_string(Lx)+"Ly"+std::to_string(Ly)+"nu"+std::to_string(nu);
   // description = "Lx"+std::to_string(Lx)+"Ly"+std::to_string(Ly)+"nu"+std::to_string(nu);
 
+  Idx xP = Lx/3+1, yP = 0;
+
   int device_num;
   cudacheck(cudaGetDeviceCount(&device_num));
   cudaDeviceProp device_prop[device_num];
@@ -33,6 +35,26 @@ int main(int argc, char **argv){
   std::cout << "dev = " << device_prop[0].name << std::endl;
   cudacheck(cudaSetDevice(0));// "TITAN V"
   std::cout << "(GPU device is set.)" << std::endl;
+
+  set_all();
+
+  std::cout << "ell0 = " << ell0[0] << ", " << ell0[1] << std::endl
+            << "ell1 = " << ell1[0] << ", " << ell1[1] << std::endl
+            << "ell2 = " << ell2[0] << ", " << ell2[1] << std::endl;
+
+  std::cout << "ell = " << ell[0] << ", " << ell[1] << ", " << ell[2] << std::endl;
+
+  std::cout << "kappa = " << kappa[0] << ", " << kappa[1] << ", " << kappa[2] << std::endl;
+
+  std::cout << "ell0* = " << ell_star0[0] << ", " << ell_star0[1] << std::endl
+            << "ell1* = " << ell_star1[0] << ", " << ell_star1[1] << std::endl
+            << "ell2* = " << ell_star2[0] << ", " << ell_star2[1] << std::endl;
+
+  std::cout << "e0 = " << e0[0] << ", " << e0[1] << std::endl
+            << "e1 = " << e1[0] << ", " << e1[1] << std::endl
+            << "e2 = " << e2[0] << ", " << e2[1] << std::endl;
+
+
 
 
   // -----
@@ -52,7 +74,7 @@ int main(int argc, char **argv){
     solve(Dinv, e);
 
     {
-      std::ofstream of( dir_data+description+"Dinv_0_0_0_cuda.dat",
+      std::ofstream of( dir_data+description+"Dinv_0_0_0.dat",
                         std::ios::out | std::ios::binary | std::ios::trunc);
       if(!of) assert(false);
 
@@ -74,7 +96,7 @@ int main(int argc, char **argv){
     solve(Dinv, e);
 
     {
-      std::ofstream of( dir_data+description+"Dinv_0_0_1_cuda.dat",
+      std::ofstream of( dir_data+description+"Dinv_0_0_1.dat",
                         std::ios::out | std::ios::binary | std::ios::trunc);
       if(!of) assert(false);
 
@@ -102,7 +124,7 @@ int main(int argc, char **argv){
     solve(Dinv, e);
 
     {
-      std::ofstream of( dir_data+description+"Dinv_m1_0_0_cuda.dat",
+      std::ofstream of( dir_data+description+"Dinv_m1_0_0.dat",
                         std::ios::out | std::ios::binary | std::ios::trunc);
       if(!of) assert(false);
 
@@ -124,7 +146,7 @@ int main(int argc, char **argv){
     solve(Dinv, e);
 
     {
-      std::ofstream of( dir_data+description+"Dinv_m1_0_1_cuda.dat",
+      std::ofstream of( dir_data+description+"Dinv_m1_0_1.dat",
                         std::ios::out | std::ios::binary | std::ios::trunc);
       if(!of) assert(false);
 
@@ -152,7 +174,7 @@ int main(int argc, char **argv){
     solve(Dinv, e);
 
     {
-      std::ofstream of( dir_data+description+"Dinv_1_m1_0_cuda.dat",
+      std::ofstream of( dir_data+description+"Dinv_1_m1_0.dat",
                         std::ios::out | std::ios::binary | std::ios::trunc);
       if(!of) assert(false);
 
@@ -174,7 +196,7 @@ int main(int argc, char **argv){
     solve(Dinv, e);
 
     {
-      std::ofstream of( dir_data+description+"Dinv_1_m1_1_cuda.dat",
+      std::ofstream of( dir_data+description+"Dinv_1_m1_1.dat",
                         std::ios::out | std::ios::binary | std::ios::trunc);
       if(!of) assert(false);
 
@@ -202,7 +224,7 @@ int main(int argc, char **argv){
     solve(Dinv, e);
 
     {
-      std::ofstream of( dir_data+description+"Dinv_0_1_0_cuda.dat",
+      std::ofstream of( dir_data+description+"Dinv_0_1_0.dat",
                         std::ios::out | std::ios::binary | std::ios::trunc);
       if(!of) assert(false);
 
@@ -224,7 +246,7 @@ int main(int argc, char **argv){
     solve(Dinv, e);
 
     {
-      std::ofstream of( dir_data+description+"Dinv_0_1_1_cuda.dat",
+      std::ofstream of( dir_data+description+"Dinv_0_1_1.dat",
                         std::ios::out | std::ios::binary | std::ios::trunc);
       if(!of) assert(false);
 
@@ -242,7 +264,7 @@ int main(int argc, char **argv){
   //
 
   {
-    int xx = Lx/3, yy = Lx/3;
+    int xx = xP, yy = yP;
 
     set2zero(e, N);
     e[ 2*idx(xx, yy) ] = cplx(1.0);
@@ -252,7 +274,7 @@ int main(int argc, char **argv){
     solve(Dinv, e);
 
     {
-      std::ofstream of( dir_data+description+"Dinv_T_T_0_cuda.dat",
+      std::ofstream of( dir_data+description+"Dinv_xP_yP_0.dat",
                         std::ios::out | std::ios::binary | std::ios::trunc);
       if(!of) assert(false);
 
@@ -274,7 +296,7 @@ int main(int argc, char **argv){
     solve(Dinv, e);
 
     {
-      std::ofstream of( dir_data+description+"Dinv_T_T_1_cuda.dat",
+      std::ofstream of( dir_data+description+"Dinv_xP_yP_1.dat",
                         std::ios::out | std::ios::binary | std::ios::trunc);
       if(!of) assert(false);
 
@@ -289,10 +311,12 @@ int main(int argc, char **argv){
     }
   }
 
-  //
-
   free( e );
   free( Dinv );
+
+
+
+
   cudaDeviceReset();
 
   return 0;

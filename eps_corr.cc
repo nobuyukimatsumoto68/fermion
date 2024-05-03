@@ -17,7 +17,8 @@
 
 
 
-int main(){
+// int main(){
+int main(int argc, char **argv){
 
 // #ifdef _OPENMP
 //   omp_set_num_threads( 4 );
@@ -26,6 +27,10 @@ int main(){
   Vect Dinv0(2*Lx*Ly);
   Vect Dinv1(2*Lx*Ly);
 
+  if (argc>1){
+    nu = atoi(argv[1]);
+    // printf("%s\n", argv[i]);
+  }
   const std::string description = "Lx"+std::to_string(Lx)+"Ly"+std::to_string(Ly)+"nu"+std::to_string(nu);
 
   {

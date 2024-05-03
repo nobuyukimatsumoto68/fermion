@@ -31,7 +31,11 @@ int main(int argc, char **argv){
   }
   const std::string description = "Lx"+std::to_string(Lx)+"Ly"+std::to_string(Ly)+"nu"+std::to_string(nu);
 
-  std::vector<M2> Dinv_n_0(Lx*Ly), Dinv_n_A(Lx*Ly), Dinv_n_B(Lx*Ly), Dinv_n_C(Lx*Ly), Dinv_n_T(Lx*Ly);
+
+  const Idx xP = Lx/3+1;
+  const Idx yP = 0;
+
+  std::vector<M2> Dinv_n_0(Lx*Ly), Dinv_n_A(Lx*Ly), Dinv_n_B(Lx*Ly), Dinv_n_C(Lx*Ly), Dinv_n_P(Lx*Ly);
 
   {
     Vect Dinv0(2*Lx*Ly);
@@ -215,7 +219,7 @@ int main(int argc, char **argv){
     Vect Dinv1(2*Lx*Ly);
 
     {
-      std::ifstream ifs( dir_data+description+"Dinv_T_T_0_cuda.dat",
+      std::ifstream ifs( dir_data+description+"Dinv_xP_yP_0_cuda.dat",
                          std::ios::in | std::ios::binary );
       if(!ifs) assert(false);
 
@@ -229,7 +233,7 @@ int main(int argc, char **argv){
 
 
     {
-      std::ifstream ifs( dir_data+description+"Dinv_T_T_1_cuda.dat",
+      std::ifstream ifs( dir_data+description+"Dinv_xP_yP_1_cuda.dat",
                          std::ios::in | std::ios::binary );
       if(!ifs) assert(false);
 
@@ -244,7 +248,7 @@ int main(int argc, char **argv){
 
     for(int x=0; x<Lx; x++){
       for(int y=0; y<Ly; y++){
-        Dinv_n_T[idx(x,y)] <<
+        Dinv_n_P[idx(x,y)] <<
           Dinv0( 2*idx(x,y) ), Dinv1( 2*idx(x,y) ),
           Dinv0( 2*idx(x,y)+1 ), Dinv1( 2*idx(x,y)+1 );
       }
@@ -295,14 +299,23 @@ int main(int argc, char **argv){
           const M2& Dinv_x_0 = Dinv_n_0[idx(x,y)];
           const M2& Dinv_x_0pn = sign1 * Dinv_n_0pn[idx(x,y)];
 
-          const M2& Dinv_T_0 = Dinv_n_0[idx(Lx/3,Lx/3)];
-          const M2& Dinv_T_0pn = sign1 * Dinv_n_0pn[idx(Lx/3,Lx/3)];
+          const M2& Dinv_P_0 = Dinv_n_0[idx(xP,yP)];
+          const M2& Dinv_P_0pn = sign1 * Dinv_n_0pn[idx(xP,yP)];
 
-          const M2& Dinv_x_T = Dinv_n_T[idx(x,y)];
+          const M2& Dinv_x_P = Dinv_n_P[idx(x,y)];
+          const M2& Dinv_P_x = (eps * Dinv_x_P * eps_inv).transpose();
 
-          const Complex tr1 = ( Dinv_T_0pn * WilsonP[n+3] * eps_inv * Dinv_x_0.transpose() * Dinv_x_T ).trace();
-          const Complex tr2 = ( Dinv_x_0pn * WilsonP[n+3] * eps_inv * Dinv_T_0.transpose() * eps_inv * Dinv_x_T.transpose() * eps ).trace();
-          const Complex corr = -0.25 * (tr1 + tr2);
+          // const Complex Tr2 = ( Dinv_x_0 * WilsonP[n] * eps_inv * Dinv_P_0pn.transpose() * eps * Dinv_P_x ).trace();
+          // const Complex tr1 = ( Dinv_P_0pn * WilsonP[n+3] * eps_inv * Dinv_x_0.transpose() * Dinv_x_P ).trace();
+          // const Complex tr2 = ( Dinv_x_0pn * WilsonP[n+3] * eps_inv * Dinv_P_0.transpose() * Dinv_P_x ).trace();
+          // const Complex tr3 = ( Dinv_P_0 * WilsonP[n] * eps_inv * Dinv_x_0pn.transpose() * eps * Dinv_x_P ).trace();
+          // const Complex tr4 = ( Dinv_P_0 * WilsonP[n] * eps_inv * Dinv_x_0pn.transpose() * eps * Dinv_x_P ).trace();
+          // const Complex tr7 = ( Dinv_P_0 * WilsonP[n] * eps_inv * Dinv_x_0pn.transpose() * eps * Dinv_x_P ).trace();
+          // const Complex tr8 = ( Dinv_x_0 * WilsonP[n] * eps_inv * Dinv_P_0pn.transpose() * eps * Dinv_P_x ).trace();
+
+          const Complex Tr1 = ( Dinv_x_0 * WilsonP[n] * eps_inv * Dinv_P_0pn.transpose() * eps * Dinv_P_x ).trace();
+          const Complex Tr2 = ( Dinv_P_0 * WilsonP[n] * eps_inv * Dinv_x_0pn.transpose() * eps * Dinv_x_P ).trace();
+          const Complex corr = -0.25 * 4.0 * (Tr1 + Tr2);
 
           of << x << " " << y << " "
              << corr.real() << " " << corr.imag() << " "
@@ -337,17 +350,29 @@ int main(int argc, char **argv){
           const int ch = mod(x-y, 3);
           if(ch!=0) continue;
 
-          // const M2& Dinv_x_0 = Dinv_n_0[idx(x,y)];
           const M2& Dinv_x_0pn = sign1 * Dinv_n_0pn[idx(x,y)];
 
-          // const M2& Dinv_H_0 = Dinv_n_0[idx(Lx/2,0)];
-          const M2& Dinv_T_0pn = sign1 * Dinv_n_0pn[idx(Lx/3,Lx/3)];
+          const M2& Dinv_P_0pn = sign1 * Dinv_n_0pn[idx(xP,yP)];
 
-          const M2& Dinv_x_T = Dinv_n_T[idx(x,y)];
+          const M2& Dinv_x_P = Dinv_n_P[idx(x,y)];
+          const M2& Dinv_P_x = (eps * Dinv_x_P * eps_inv).transpose();
 
-          const Complex tr1 = ( Dinv_T_0pn * WilsonP[n+3] * eps_inv * Dinv_x_0pn.transpose() * Dinv_x_T ).trace();
-          const Complex tr2 = ( Dinv_x_0pn * WilsonP[n+3] * eps_inv * Dinv_T_0pn.transpose() * eps_inv * Dinv_x_T.transpose() * eps ).trace();
-          const Complex corr = -0.25 * (tr1 + tr2);
+          // const Complex tr1 = ( Dinv_P_0pn * eps_inv * Dinv_x_0pn.transpose() * Dinv_x_P ).trace();
+          // const Complex tr2 = ( Dinv_x_0pn * eps_inv * Dinv_P_0pn.transpose() * eps_inv * Dinv_x_P.transpose() * eps ).trace();
+          // const Complex tr3 = ( Dinv_P_0pn * eps_inv * Dinv_x_0pn.transpose() * eps * Dinv_x_P ).trace();
+          // const Complex tr4 = ( Dinv_P_0pn * eps_inv * Dinv_x_0pn.transpose() * eps * Dinv_x_P ).trace();
+          // const Complex tr5 = ( Dinv_x_0pn * eps_inv * Dinv_P_0pn.transpose() * eps * Dinv_P_x ).trace();
+          // const Complex tr6 = ( Dinv_x_0pn * eps_inv * Dinv_P_0pn.transpose() * eps * Dinv_P_x ).trace();
+
+          // const Complex tr7 = ( Dinv_P_0pn * eps_inv * Dinv_x_0pn.transpose() * eps * Dinv_x_P ).trace();
+          // const Complex tr8 = ( Dinv_x_0pn * eps_inv * Dinv_P_0pn.transpose() * eps * Dinv_P_x ).trace();
+
+          const Complex Tr1 = ( Dinv_x_0pn * eps_inv * Dinv_P_0pn.transpose() * eps * Dinv_P_x ).trace();
+          const Complex Tr2 = ( Dinv_P_0pn * eps_inv * Dinv_x_0pn.transpose() * eps * Dinv_x_P ).trace();
+          const Complex corr = -0.125 * 4.0 * (Tr1 + Tr2);
+
+          // const Complex corr = -0.125 * (tr1 + tr2 + tr3 + tr4 + tr5 + tr6 + tr7 + tr8);
+          // const Complex corr = -0.125 * (tr1 + tr2 + tr3 + tr4 + tr5 + tr6);
 
           of << x << " " << y << " "
              << corr.real() << " " << corr.imag() << " "
@@ -370,12 +395,29 @@ int main(int argc, char **argv){
         if(ch!=0) continue;
 
         const M2& Dinv_x_0 = Dinv_n_0[idx(x,y)];
-        const M2& Dinv_T_0 = Dinv_n_0[idx(Lx/3,Lx/3)];
-        const M2& Dinv_x_T = Dinv_n_T[idx(x,y)];
+        const M2& Dinv_P_0 = Dinv_n_0[idx(xP,yP)];
+        const M2& Dinv_x_P = Dinv_n_P[idx(x,y)];
+        const M2& Dinv_P_x = (eps * Dinv_x_P * eps_inv).transpose();
 
-        const Complex tr1 = ( Dinv_T_0 * eps_inv * Dinv_x_0.transpose() * Dinv_x_T ).trace();
-        const Complex tr2 = ( Dinv_x_0 * eps_inv * Dinv_T_0.transpose() * eps_inv * Dinv_x_T.transpose() * eps ).trace();
-        const Complex corr = -0.125 * (tr1 + tr2);
+        // const Complex tr1 = ( Dinv_P_0 * eps_inv * Dinv_x_0.transpose() * Dinv_x_P ).trace();
+        // const Complex tr2 = ( Dinv_x_0 * eps_inv * Dinv_P_0.transpose() * eps_inv * Dinv_x_P.transpose() * eps ).trace();
+        // const Complex tr3 = ( Dinv_P_0 * eps_inv * Dinv_x_0.transpose() * eps * Dinv_x_P ).trace();
+        // const Complex tr4 = ( Dinv_P_0 * eps_inv * Dinv_x_0.transpose() * eps * Dinv_x_P ).trace();
+        // const Complex tr5 = ( Dinv_x_0 * eps_inv * Dinv_P_0.transpose() * eps * Dinv_P_x ).trace();
+        // const Complex tr6 = ( Dinv_x_0 * eps_inv * Dinv_P_0.transpose() * eps * Dinv_P_x ).trace();
+
+        // const Complex tr7 = ( Dinv_P_0 * eps_inv * Dinv_x_0.transpose() * eps * Dinv_x_P ).trace();
+        // const Complex tr8 = ( Dinv_x_0 * eps_inv * Dinv_P_0.transpose() * eps * Dinv_P_x ).trace();
+
+        // const Complex corr = -0.125 * (tr1 + tr2 + tr3 + tr4 + tr5 + tr6 + tr7 + tr8);
+
+        const Complex Tr1 = ( Dinv_x_0 * eps_inv * Dinv_P_0.transpose() * eps * Dinv_P_x ).trace();
+        const Complex Tr2 = ( Dinv_P_0 * eps_inv * Dinv_x_0.transpose() * eps * Dinv_x_P ).trace();
+        const Complex corr = -0.125 * 4.0 * (Tr1 + Tr2);
+
+        // const Complex corr = -0.125 * (tr1 + tr2 + tr3 + tr4 + tr5 + tr6);
+
+        // const Complex corr = -0.125 * (tr1 + tr2);
 
         of << x << " " << y << " "
            << corr.real() << " " << corr.imag() << " "

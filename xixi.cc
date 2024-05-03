@@ -36,7 +36,7 @@ int main(int argc, char **argv){
     Vect Dinv1(2*Lx*Ly);
 
     {
-      std::ifstream ifs( dir_data+description+"Dinv_0_0_0_cuda.dat",
+      std::ifstream ifs( dir_data+description+"Dinv_0_0_0.dat",
                          std::ios::in | std::ios::binary );
       if(!ifs) assert(false);
 
@@ -50,7 +50,7 @@ int main(int argc, char **argv){
 
 
     {
-      std::ifstream ifs( dir_data+description+"Dinv_0_0_1_cuda.dat",
+      std::ifstream ifs( dir_data+description+"Dinv_0_0_1.dat",
                          std::ios::in | std::ios::binary );
       if(!ifs) assert(false);
 
@@ -119,7 +119,7 @@ int main(int argc, char **argv){
 //   Vect Dinv1(2*Lx*Ly);
 
 //   {
-//     std::ifstream ifs( dir_data+description+"Dinv_m1_0_0_cuda.dat",
+//     std::ifstream ifs( dir_data+description+"Dinv_m1_0_0.dat",
 //                        std::ios::in | std::ios::binary );
 //     if(!ifs) assert(false);
 
@@ -133,7 +133,7 @@ int main(int argc, char **argv){
 
 
 //   {
-//     std::ifstream ifs( dir_data+description+"Dinv_m1_0_1_cuda.dat",
+//     std::ifstream ifs( dir_data+description+"Dinv_m1_0_1.dat",
 //                        std::ios::in | std::ios::binary );
 //     if(!ifs) assert(false);
 
@@ -193,7 +193,7 @@ int main(int argc, char **argv){
 //   Vect Dinv1(2*Lx*Ly);
 
 //   {
-//     std::ifstream ifs( dir_data+description+"Dinv_0_1_0_cuda.dat",
+//     std::ifstream ifs( dir_data+description+"Dinv_0_1_0.dat",
 //                        std::ios::in | std::ios::binary );
 //     if(!ifs) assert(false);
 
@@ -207,7 +207,7 @@ int main(int argc, char **argv){
 
 
 //   {
-//     std::ifstream ifs( dir_data+description+"Dinv_0_1_1_cuda.dat",
+//     std::ifstream ifs( dir_data+description+"Dinv_0_1_1.dat",
 //                        std::ios::in | std::ios::binary );
 //     if(!ifs) assert(false);
 
