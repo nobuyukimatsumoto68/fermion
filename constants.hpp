@@ -6,7 +6,7 @@
 // ======================================
 
 
-const bool is_periodic_orthogonal = true;
+const bool is_periodic_orthogonal = false;
 
 const int TWO = 2;
 const int THREE = 3;
@@ -18,7 +18,7 @@ int nu = 3; // 1,2,3,4 // PP, PA, AA, AP // xy
 const double m = 0.0;
 
 const long Lx = 6 * 20;
-const long Ly = Lx/2;
+const long Ly = Lx;
 
 // -------------------
 
@@ -101,14 +101,15 @@ const int nparallel = 12;
 // constexpr double ell2 = 0.5;
 
 
+// const double length = 1.0;
+// const double theta = M_PI/3.0;
 const double length = 1.0;
-const double theta = M_PI/3.0;
+const double theta = 4.0*M_PI/9.0;
 const double omega[2] = { length * std::cos(theta), length * std::sin(theta) };
 
 double ell0[2]; // = {1.0, 0.0};
 double ell2[2]; // = -omega;
 double ell1[2]; // -ell2 - ell0
-
 
 double ell[3]; // {|ell0|, |ell1|, |ell2|}
 

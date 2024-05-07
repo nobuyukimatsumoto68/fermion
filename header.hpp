@@ -18,6 +18,123 @@ const Pauli sigma = get_Pauli();
 const Complex I = Complex(0.0, 1.0);
 
 
+
+
+
+void set_ell(){
+  ell0[0] = 1.0;
+  ell0[1] = 0.0;
+
+  ell2[0] = -omega[0];
+  ell2[1] = -omega[1];
+
+  ell1[0] = -ell2[0] - ell0[0];
+  ell1[1] = -ell2[1] - ell0[1];
+
+  ell[0] = std::sqrt( ell0[0]*ell0[0] + ell0[1]*ell0[1] );
+  ell[1] = std::sqrt( ell1[0]*ell1[0] + ell1[1]*ell1[1] );
+  ell[2] = std::sqrt( ell2[0]*ell2[0] + ell2[1]*ell2[1] );
+}
+
+
+void set_kappa(){
+  kappa[0] = 2.0*ell[0] / (ell[0] + ell[1] + ell[2]);
+  kappa[1] = 2.0*ell[1] / (ell[0] + ell[1] + ell[2]);
+  kappa[2] = 2.0*ell[2] / (ell[0] + ell[1] + ell[2]);
+}
+
+
+void set_ell_star(){
+  const double s = 0.5 * (ell[0]+ell[1]+ell[2]);
+  const double area = std::sqrt( s*(s-ell[0])*(s-ell[1])*(s-ell[2]) );
+
+  double coeff;
+  coeff = 0.25 * (ell[1]*ell[1] + ell[2]*ell[2] - ell[0]*ell[0]) / area;
+  ell_star0[1] = -ell0[1] * coeff;
+  ell_star0[0] = -ell0[0] * coeff;
+  // ell_star0[0] =  ell0[1] * coeff;
+  // ell_star0[1] = -ell0[0] * coeff;
+
+  coeff = 0.25 * (ell[2]*ell[2] + ell[0]*ell[0] - ell[1]*ell[1]) / area;
+  ell_star1[1] = -ell1[1] * coeff;
+  ell_star1[0] = -ell1[0] * coeff;
+  // ell_star1[0] =  ell1[1] * coeff;
+  // ell_star1[1] = -ell1[0] * coeff;
+
+  coeff = 0.25 * (ell[0]*ell[0] + ell[1]*ell[1] - ell[2]*ell[2]) / area;
+  ell_star2[1] = -ell2[1] * coeff;
+  ell_star2[0] = -ell2[0] * coeff;
+  // ell_star2[0] =  ell2[1] * coeff;
+  // ell_star2[1] = -ell2[0] * coeff;
+}
+
+
+void set_e(){
+  double len;
+
+  len = std::sqrt( ell_star0[0]*ell_star0[0] + ell_star0[1]*ell_star0[1] );
+  e0[0] = ell_star0[0]/len;
+  e0[1] = ell_star0[1]/len;
+
+  len = std::sqrt( ell_star1[0]*ell_star1[0] + ell_star1[1]*ell_star1[1] );
+  e1[0] = ell_star1[0]/len;
+  e1[1] = ell_star1[1]/len;
+
+  len = std::sqrt( ell_star2[0]*ell_star2[0] + ell_star2[1]*ell_star2[1] );
+  e2[0] = ell_star2[0]/len;
+  e2[1] = ell_star2[1]/len;
+}
+
+
+void set_all(){
+  set_ell();
+  set_kappa();
+  set_ell_star();
+  set_e();
+}
+
+
+// void get_e( double* res, const int mu ){
+//   if(mu==0){
+//     // res[0] = -1.0;
+//     // res[1] = 0.0;
+//     res[0] = d_e0[0];
+//     res[1] = d_e0[1];
+//   }
+//   else if(mu==1){
+//     // res[0] = 0.5;
+//     // res[1] = -0.5*sqrt(3.0);
+//     res[0] = d_e1[0];
+//     res[1] = d_e1[1];
+//   }
+//   else if(mu==2){
+//     // res[0] = 0.5;
+//     // res[1] = 0.5*sqrt(3.0);
+//     res[0] = d_e2[0];
+//     res[1] = d_e2[1];
+//   }
+//   else if(mu==3){
+//     // res[0] = 1.0;
+//     // res[1] = 0.0;
+//     res[0] = -d_e0[0];
+//     res[1] = -d_e0[1];
+//   }
+//   else if(mu==4){
+//     // res[0] = -0.5;
+//     // res[1] = 0.5*sqrt(3.0);
+//     res[0] = -d_e1[0];
+//     res[1] = -d_e1[1];
+//   }
+//   else if(mu==5){
+//     // res[0] = -0.5;
+//     // res[1] = -0.5*sqrt(3.0);
+//     res[0] = -d_e2[0];
+//     res[1] = -d_e2[1];
+//   }
+//   else assert(false);
+// }
+
+
 int mod(const int a, const int b){ return (b +(a%b))%b; }
 
 bool is_site(const int x, const int y) {
@@ -192,7 +309,8 @@ int cshift_minus(int& xp, int& yp, const int x, const int y, const int mu){
   }
   else assert(false);
 
-  return res;}
+  return res;
+}
 
 
 
@@ -200,28 +318,40 @@ V2 get_e( const int mu ){
   V2 res;
 
   if(mu==0){
-    res(0) = -1.0;
-    res(1) = 0.0;
+    // res(0) = -1.0;
+    // res(1) = 0.0;
+    res(0) = e0[0];
+    res(1) = e0[1];
   }
   else if(mu==1){
-    res(0) = 0.5;
-    res(1) = -0.5*sqrt(3);
+    // res(0) = 0.5;
+    // res(1) = -0.5*sqrt(3);
+    res(0) = e1[0];
+    res(1) = e1[1];
   }
   else if(mu==2){
-    res(0) = 0.5;
-    res(1) = 0.5*sqrt(3);
+    // res(0) = 0.5;
+    // res(1) = 0.5*sqrt(3);
+    res(0) = e2[0];
+    res(1) = e2[1];
   }
   else if(mu==3){
-    res(0) = 1.0;
-    res(1) = 0.0;
+    // res(0) = 1.0;
+    // res(1) = 0.0;
+    res(0) = -e0[0];
+    res(1) = -e0[1];
   }
   else if(mu==4){
-    res(0) = -0.5;
-    res(1) = 0.5*sqrt(3);
+    // res(0) = -0.5;
+    // res(1) = 0.5*sqrt(3);
+    res(0) = -e1[0];
+    res(1) = -e1[1];
   }
   else if(mu==5){
-    res(0) = -0.5;
-    res(1) = -0.5*sqrt(3);
+    // res(0) = -0.5;
+    // res(1) = -0.5*sqrt(3);
+    res(0) = -e2[0];
+    res(1) = -e2[1];
   }
   else assert(false);
 

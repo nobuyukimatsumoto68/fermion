@@ -30,6 +30,8 @@ int main(int argc, char **argv){
   // description = "Lx"+std::to_string(Lx)+"Ly"+std::to_string(Ly)+"nu"+std::to_string(nu);
   const std::string description = "Lx"+std::to_string(Lx)+"Ly"+std::to_string(Ly)+"nu"+std::to_string(nu);
 
+  set_all();
+
 
   {
     Vect Dinv0(2*Lx*Ly);
