@@ -24,16 +24,19 @@ int main(){
   omp_set_num_threads( nparallel );
 #endif
 
-  const std::string description = "Lx"+std::to_string(Lx)+"Ly"+std::to_string(Ly)+"nu"+std::to_string(nu);
+  // const std::string description = "Lx"+std::to_string(Lx)+"Ly"+std::to_string(Ly)+"nu"+std::to_string(nu);
+  const std::string description = "Lx"+std::to_string(Lx)+"Ly"+std::to_string(Ly)+"nu"+std::to_string(nu)+"theta"+std::to_string(theta);
 
   std::vector<M2> Dinv_n_0(Lx*Ly), Dinv_n_A(Lx*Ly), Dinv_n_B(Lx*Ly), Dinv_n_C(Lx*Ly);
+
+  set_all();
 
   {
     Vect Dinv0(2*Lx*Ly);
     Vect Dinv1(2*Lx*Ly);
 
     {
-      std::ifstream ifs( dir_data+description+"Dinv_0_0_0_cuda.dat",
+      std::ifstream ifs( dir_data+description+"Dinv_0_0_0.dat",
                          std::ios::in | std::ios::binary );
       if(!ifs) assert(false);
 
@@ -47,8 +50,8 @@ int main(){
 
 
     {
-      std::ifstream ifs( dir_data+description+"Dinv_0_0_1_cuda.dat",
-                         // std::ifstream ifs( dir_data+description+"Dinv1_cuda.dat",
+      std::ifstream ifs( dir_data+description+"Dinv_0_0_1.dat",
+                         // std::ifstream ifs( dir_data+description+"Dinv1.dat",
                          std::ios::in | std::ios::binary );
       if(!ifs) assert(false);
 
@@ -78,7 +81,7 @@ int main(){
     Vect Dinv1(2*Lx*Ly);
 
     {
-      std::ifstream ifs( dir_data+description+"Dinv_m1_0_0_cuda.dat",
+      std::ifstream ifs( dir_data+description+"Dinv_m1_0_0.dat",
                          std::ios::in | std::ios::binary );
       if(!ifs) assert(false);
 
@@ -92,7 +95,7 @@ int main(){
 
 
     {
-      std::ifstream ifs( dir_data+description+"Dinv_m1_0_1_cuda.dat",
+      std::ifstream ifs( dir_data+description+"Dinv_m1_0_1.dat",
                          std::ios::in | std::ios::binary );
       if(!ifs) assert(false);
 
@@ -122,7 +125,7 @@ int main(){
     Vect Dinv1(2*Lx*Ly);
 
     {
-      std::ifstream ifs( dir_data+description+"Dinv_1_m1_0_cuda.dat",
+      std::ifstream ifs( dir_data+description+"Dinv_1_m1_0.dat",
                          std::ios::in | std::ios::binary );
       if(!ifs) assert(false);
 
@@ -136,7 +139,7 @@ int main(){
 
 
     {
-      std::ifstream ifs( dir_data+description+"Dinv_1_m1_1_cuda.dat",
+      std::ifstream ifs( dir_data+description+"Dinv_1_m1_1.dat",
                          std::ios::in | std::ios::binary );
       if(!ifs) assert(false);
 
@@ -166,7 +169,7 @@ int main(){
     Vect Dinv1(2*Lx*Ly);
 
     {
-      std::ifstream ifs( dir_data+description+"Dinv_0_1_0_cuda.dat",
+      std::ifstream ifs( dir_data+description+"Dinv_0_1_0.dat",
                          std::ios::in | std::ios::binary );
       if(!ifs) assert(false);
 
@@ -180,7 +183,7 @@ int main(){
 
 
     {
-      std::ifstream ifs( dir_data+description+"Dinv_0_1_1_cuda.dat",
+      std::ifstream ifs( dir_data+description+"Dinv_0_1_1.dat",
                          std::ios::in | std::ios::binary );
       if(!ifs) assert(false);
 

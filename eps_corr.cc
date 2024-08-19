@@ -31,10 +31,14 @@ int main(int argc, char **argv){
     nu = atoi(argv[1]);
     // printf("%s\n", argv[i]);
   }
-  const std::string description = "Lx"+std::to_string(Lx)+"Ly"+std::to_string(Ly)+"nu"+std::to_string(nu);
+  // const std::string description = "Lx"+std::to_string(Lx)+"Ly"+std::to_string(Ly)+"nu"+std::to_string(nu);
+  // const std::string description = "Lx"+std::to_string(Lx)+"Ly"+std::to_string(Ly)+"nu"+std::to_string(nu)+"theta"+std::to_string(theta);
+  set_all();
+  // const std::string description = "Lx"+std::to_string(Lx)+"Ly"+std::to_string(Ly)+"nu"+std::to_string(nu)+"tautil"+std::to_string(tautil1)+"_"+std::to_string(tautil2);
+  const std::string description = "Lx"+std::to_string(Lx)+"Ly"+std::to_string(Ly)+"nu"+std::to_string(nu)+"tautil"+std::to_string(tautil1)+"_"+std::to_string(tautil2)+str(is_periodic_orthogonal);
 
   {
-    std::ifstream ifs( dir_data+description+"Dinv_0_0_0_cuda.dat",
+    std::ifstream ifs( dir_data+description+"Dinv_0_0_0.dat",
                        std::ios::in | std::ios::binary );
     if(!ifs) assert(false);
 
@@ -48,7 +52,7 @@ int main(int argc, char **argv){
 
 
   {
-    std::ifstream ifs( dir_data+description+"Dinv_0_0_1_cuda.dat",
+    std::ifstream ifs( dir_data+description+"Dinv_0_0_1.dat",
                        std::ios::in | std::ios::binary );
     if(!ifs) assert(false);
 

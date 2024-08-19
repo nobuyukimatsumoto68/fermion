@@ -14,12 +14,13 @@ DIR = ./
 # # all: solve.o solve.o eps.o tt.o
 
 # all: solve.o eigen_matrix.o
-all: solve.o tt.o eps.o t_vev.o t_vev_v2.o eps_vev.o xixi.o eig.o tt_v2.o t_epseps.o
+# all: solve.o tt.o eps.o t_vev.o t_vev_v2.o eps_vev.o xixi.o eig.o tt_v2.o t_epseps.o eigen_matrix.o
+all: solve.o xixi.o eps.o eps_vev.o tt_v2_all.o t_vev.o t_vev_v2.o t_epseps.o eig.o
 # eigen_matrix.o
 # all: solve.o acc.o cpu1.o cpuM.o
 # all: tt.o eps.o t_vev.o psipsi.o eig.o
 
-solve.o: solve.cu header_cuda.hpp typedefs_cuda.hpp constants.hpp #
+solve.o: solve.cu header_cuda.hpp typedefs_cuda.hpp constants.hpp
 	$(NVCC) $< $(NVCCFLAGS) $(INCLUDES_CUDA) -o $(DIR)$@
 cpu1.o: solve.cc header.hpp constants.hpp
 	$(CXX) $< $(CXXFLAGS0) $(INCLUDES) -o $(DIR)$@
@@ -30,6 +31,12 @@ tt.o: tt_corr.cc header.hpp typedefs.hpp constants.hpp
 	$(CXX) $< $(CXXFLAGS) $(INCLUDES) -o $(DIR)$@
 
 tt_v2.o: tt_corr_v2.cc header.hpp typedefs.hpp constants.hpp
+	$(CXX) $< $(CXXFLAGS) $(INCLUDES) -o $(DIR)$@
+
+tt_v2_all.o: tt_corr_v2_all.cc header.hpp typedefs.hpp constants.hpp
+	$(CXX) $< $(CXXFLAGS) $(INCLUDES) -o $(DIR)$@
+
+tt_v2_odd.o: tt_corr_v2_odd.cc header.hpp typedefs.hpp constants.hpp
 	$(CXX) $< $(CXXFLAGS) $(INCLUDES) -o $(DIR)$@
 
 t_vev.o: t_vev.cc header.hpp typedefs.hpp constants.hpp

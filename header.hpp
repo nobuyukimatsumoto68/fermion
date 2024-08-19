@@ -21,27 +21,44 @@ const Complex I = Complex(0.0, 1.0);
 
 
 
+void set_tautil(){
+  if(!tautil_default){
+    tautil1 = abs_tautil*std::cos(arg_tautil);
+    tautil2 = abs_tautil*std::sin(arg_tautil);
+  }
+}
+
+
+
+// void set_ell(){
+//   ell0[0] = 1.0;
+//   ell0[1] = 0.0;
+
+//   ell1[0] = -omega[0];
+//   ell1[1] = -omega[1];
+
+//   ell2[0] = -ell1[0] - ell0[0];
+//   ell2[1] = -ell1[1] - ell0[1];
+
+//   ell[0] = std::sqrt( ell0[0]*ell0[0] + ell0[1]*ell0[1] );
+//   ell[1] = std::sqrt( ell1[0]*ell1[0] + ell1[1]*ell1[1] );
+//   ell[2] = std::sqrt( ell2[0]*ell2[0] + ell2[1]*ell2[1] );
+// }
 void set_ell(){
-  ell0[0] = 1.0;
-  ell0[1] = 0.0;
+  ell1[0] = 1.0+tautil1;
+  ell1[1] = tautil2;
 
-  ell2[0] = -omega[0];
-  ell2[1] = -omega[1];
+  ell0[0] = 1.0-2.0*tautil1;
+  ell0[1] = -2.0*tautil2;
 
-  ell1[0] = -ell2[0] - ell0[0];
-  ell1[1] = -ell2[1] - ell0[1];
+  ell2[0] = -2.0+tautil1;
+  ell2[1] = tautil2;
 
   ell[0] = std::sqrt( ell0[0]*ell0[0] + ell0[1]*ell0[1] );
   ell[1] = std::sqrt( ell1[0]*ell1[0] + ell1[1]*ell1[1] );
   ell[2] = std::sqrt( ell2[0]*ell2[0] + ell2[1]*ell2[1] );
 }
 
-
-void set_kappa(){
-  kappa[0] = 2.0*ell[0] / (ell[0] + ell[1] + ell[2]);
-  kappa[1] = 2.0*ell[1] / (ell[0] + ell[1] + ell[2]);
-  kappa[2] = 2.0*ell[2] / (ell[0] + ell[1] + ell[2]);
-}
 
 
 void set_ell_star(){
@@ -50,23 +67,129 @@ void set_ell_star(){
 
   double coeff;
   coeff = 0.25 * (ell[1]*ell[1] + ell[2]*ell[2] - ell[0]*ell[0]) / area;
-  ell_star0[1] = -ell0[1] * coeff;
-  ell_star0[0] = -ell0[0] * coeff;
-  // ell_star0[0] =  ell0[1] * coeff;
-  // ell_star0[1] = -ell0[0] * coeff;
+  // ell_star0[1] = -ell0[1] * coeff;
+  // ell_star0[0] = -ell0[0] * coeff;
+  ell_star0[0] =  ell0[1] * coeff;
+  ell_star0[1] = -ell0[0] * coeff;
+  // ell_star0[0] = -ell1[1] * coeff;
+  // ell_star0[1] =  ell1[0] * coeff;
 
   coeff = 0.25 * (ell[2]*ell[2] + ell[0]*ell[0] - ell[1]*ell[1]) / area;
-  ell_star1[1] = -ell1[1] * coeff;
-  ell_star1[0] = -ell1[0] * coeff;
-  // ell_star1[0] =  ell1[1] * coeff;
-  // ell_star1[1] = -ell1[0] * coeff;
+  // ell_star1[1] = -ell1[1] * coeff;
+  // ell_star1[0] = -ell1[0] * coeff;
+  ell_star1[0] =  ell1[1] * coeff;
+  ell_star1[1] = -ell1[0] * coeff;
+  // ell_star1[0] = -ell2[1] * coeff;
+  // ell_star1[1] =  ell2[0] * coeff;
 
   coeff = 0.25 * (ell[0]*ell[0] + ell[1]*ell[1] - ell[2]*ell[2]) / area;
-  ell_star2[1] = -ell2[1] * coeff;
-  ell_star2[0] = -ell2[0] * coeff;
-  // ell_star2[0] =  ell2[1] * coeff;
-  // ell_star2[1] = -ell2[0] * coeff;
+  // ell_star2[1] = -ell2[1] * coeff;
+  // ell_star2[0] = -ell2[0] * coeff;
+  ell_star2[0] =  ell2[1] * coeff;
+  ell_star2[1] = -ell2[0] * coeff;
+  // ell_star2[0] = -ell0[1] * coeff;
+  // ell_star2[1] =  ell0[0] * coeff;
 }
+
+
+
+// void get_angle_x(){
+//   double xaxis[2];
+//   xaxis[0] = ell_star1[0] + ell_star2[0] - 2.0*ell_star0[0];
+//   xaxis[1] = ell_star1[1] + ell_star2[1] - 2.0*ell_star0[1];
+//   // xaxis[0] = -ell_star1[0];
+//   // xaxis[1] = -ell_star1[1];
+
+//   const double abs = std::sqrt(xaxis[0]*xaxis[0] + xaxis[1]*xaxis[1]);
+//   // angle_x = std::acos( xaxis[0]/abs );
+//   angle_x = -std::acos( xaxis[0]/abs );
+// }
+
+
+// void rotate( double* v, const double theta ){
+//   const double cos = std::cos(theta);
+//   const double sin = std::sin(theta);
+
+//   const double x = v[0];
+//   const double y = v[1];
+
+//   v[0] = cos*x + sin*y;
+//   v[1] = -sin*x + cos*y;
+// }
+
+
+
+
+// void rearrange(){
+//   double tmp[2];
+
+//   ////
+//   tmp[0] = ell_star2[0];
+//   tmp[1] = ell_star2[1];
+//   ell_star2[0] = ell_star0[0];
+//   ell_star2[1] = ell_star0[1];
+//   ell_star0[0] = tmp[0]; // ell_star2[0];
+//   ell_star0[1] = tmp[1]; // ell_star2[1];
+
+//   ////
+//   tmp[0] = ell2[0];
+//   tmp[1] = ell2[1];
+//   ell2[0] = ell0[0];
+//   ell2[1] = ell0[1];
+//   ell0[0] = tmp[0]; // ell_star2[0];
+//   ell0[1] = tmp[1]; // ell_star2[1];
+
+//   //
+//   tmp[0] = kappa[2];
+//   kappa[2] = kappa[0];
+//   kappa[0] = tmp[0];
+
+//   //
+//   tmp[0] = ell[2];
+//   ell[2] = ell[0];
+//   ell[0] = tmp[0];
+
+//   //
+//   get_angle_x();
+
+//   rotate(ell0, angle_x);
+//   rotate(ell1, angle_x);
+//   rotate(ell2, angle_x);
+
+//   rotate(ell_star0, angle_x);
+//   rotate(ell_star1, angle_x);
+//   rotate(ell_star2, angle_x);
+// }
+
+
+
+
+
+// __host__
+void set_kappa(){
+  // kappa[2] = 2.0*ell[0] / (ell[0] + ell[1] + ell[2]);
+  // kappa[0] = 2.0*ell[1] / (ell[0] + ell[1] + ell[2]);
+  // kappa[1] = 2.0*ell[2] / (ell[0] + ell[1] + ell[2]);
+  kappa[0] = 2.0*ell[0] / (ell[0] + ell[1] + ell[2]);
+  kappa[1] = 2.0*ell[1] / (ell[0] + ell[1] + ell[2]);
+  kappa[2] = 2.0*ell[2] / (ell[0] + ell[1] + ell[2]);
+
+  // kappa[0] = 1.0/std::sqrt( ell_star0[0]*ell_star0[0] + ell_star0[1]*ell_star0[1] );
+  // kappa[1] = 1.0/std::sqrt( ell_star1[0]*ell_star1[0] + ell_star1[1]*ell_star1[1] );
+  // kappa[2] = 1.0/std::sqrt( ell_star2[0]*ell_star2[0] + ell_star2[1]*ell_star2[1] );
+
+  // kappa[0] = 1.0/std::sqrt( ell_star0[0]*ell_star0[0] + ell_star0[1]*ell_star0[1] );
+  // kappa[1] = 1.0/std::sqrt( ell_star1[0]*ell_star1[0] + ell_star1[1]*ell_star1[1] );
+  // kappa[2] = 1.0/std::sqrt( ell_star2[0]*ell_star2[0] + ell_star2[1]*ell_star2[1] );
+  // double tmp = kappa[0] + kappa[1] + kappa[2];
+  // kappa[0] *= 2.0/tmp;
+  // kappa[1] *= 2.0/tmp;
+  // kappa[2] *= 2.0/tmp;
+
+  // cudacheck( cudaMemcpyToSymbol(d_kappa, kappa, 3*sizeof(DB)) );
+}
+
+
 
 
 void set_e(){
@@ -87,9 +210,11 @@ void set_e(){
 
 
 void set_all(){
+  set_tautil();
   set_ell();
-  set_kappa();
   set_ell_star();
+  set_kappa();
+  // rearrange();
   set_e();
 }
 

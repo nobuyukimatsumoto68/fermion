@@ -17,82 +17,12 @@ int nu = 3; // 1,2,3,4 // PP, PA, AA, AP // xy
 
 const double m = 0.0;
 
-const long Lx = 6 * 20;
+const long Lx = 6*32; // 6; // ; * 20;
 const long Ly = Lx;
 
 // -------------------
 
-// const unsigned long Lx = 9;
-// const unsigned long Ly = 12;
-
-// const unsigned long Lx = 6 * 2;
-// const unsigned long Ly = 6 * 4;
-
-// const unsigned long Lx = 6 * 4;
-// const unsigned long Ly = 6 * 8;
-
-// const unsigned long Lx = 6 * 6;
-// const unsigned long Ly = 6 * 12;
-
-// const unsigned long Lx = 6 * 8;
-// const unsigned long Ly = 6 * 16;
-
-// const unsigned long Lx = 6 * 12;
-// const unsigned long Ly = 2*Lx;
-
-// const unsigned long Lx = 6 * 16;
-// const unsigned long Ly = 6 * 32;
-
-// const unsigned long Lx = 6 * 32;
-// const unsigned long Ly = Lx * 3;
-
-
-// const unsigned long Lx = 6 * 16;
-// const unsigned long Ly = 6 * 16 * 3;
-
-
-// -------------------
-
-
-// const unsigned long Lx = 6 * 2;
-// const unsigned long Ly = 6 * 2;
-
-// const unsigned long Lx = 6 * 6;
-// const unsigned long Ly = 6 * 6;
-
-
-
-
-// const unsigned long Lx = 6 * 20; // 20
-// const unsigned long Ly = Lx;
-
-
-// const unsigned long Lx = 6 * 32;
-// const unsigned long Ly = 6 * 32;
-
-// const unsigned long Lx = 6 * 64;
-// const unsigned long Ly = 6 * 64;
-
-// const unsigned long Lx = 6 * 128;
-// const unsigned long Ly = 6 * 128;
-
-// const unsigned long Lx = 6 * 256;
-// const unsigned long Ly = 6 * 256;
-
-// const unsigned long Lx = 6 * 512;
-// const unsigned long Ly = 6 * 512;
-// const unsigned long Lx = 6 * 1024;
-// const unsigned long Ly = 6 * 1024;
-
-// const double m = 2.0;
-// const unsigned long Lx = 6 * 512;
-// const unsigned long Ly = 6 * 1024;
-
-// const double alat = 0.01; // ell
 const int nparallel = 12;
-
-// const double Vy = 3.0*sqrt(3.0)/4.0 * alat*alat;
-// const double my = m + 2.0/3.0 * 3.0/alat;
 
 // const double Mu = 1.0;
 // double Mu = 1.0;
@@ -100,16 +30,25 @@ const int nparallel = 12;
 // constexpr double ell1 = 1.0;
 // constexpr double ell2 = 0.5;
 
+// const double abs_tautil = 1.0; // 1.0 <= abs
+// const double arg_tautil = 3.5/9.0 * M_PI; // pi/3.0 <= arg <= pi/2.0 // 3.35
+const double abs_tautil = 1.2; // 1.0 <= abs
+const double arg_tautil = 4.0/9.0 * M_PI; // pi/3.0 <= arg <= pi/2.0 // 3.35
+// const double abs_tautil = 1.0; // 1.0 <= abs
+// const double arg_tautil = 3.5/9.0 * M_PI; // pi/3.0 <= arg <= pi/2.0 // 3.35
+const bool tautil_default = false; // true->below
+double tautil1 = 0.3420201433256688;
+double tautil2 = 0.9396926207859083 + 0.00001;
 
-// const double length = 1.0;
-// const double theta = M_PI/3.0;
-const double length = 1.0;
-const double theta = 4.0*M_PI/9.0;
-const double omega[2] = { length * std::cos(theta), length * std::sin(theta) };
+const int xs = 0;
+const int ys = 0;
+
+const int xP = Lx/2, yP = 0;
+
 
 double ell0[2]; // = {1.0, 0.0};
-double ell2[2]; // = -omega;
-double ell1[2]; // -ell2 - ell0
+double ell1[2]; // = -omega;
+double ell2[2]; // -ell2 - ell0
 
 double ell[3]; // {|ell0|, |ell1|, |ell2|}
 
@@ -147,3 +86,7 @@ double kappa[3];
 // const std::string description_old = "m"+std::to_string(m)+"Lx"+std::to_string(Lx)+"Ly"+std::to_string(Ly)+"alat"+std::to_string(alat);
 const std::string dir_data = "./data/";
 
+std::string str( const bool x){
+  if (x) return "True";
+  return "False";
+}

@@ -28,7 +28,10 @@ int main(int argc, char **argv){
   if (argc>1) nu = atoi(argv[1]);
   // if (argc>2) kappa = atoi(argv[2]);
   std::cout << "nu = " << nu << std::endl;
-  std::string description = "Lx"+std::to_string(Lx)+"Ly"+std::to_string(Ly)+"nu"+std::to_string(nu);
+  // std::string description = "Lx"+std::to_string(Lx)+"Ly"+std::to_string(Ly)+"nu"+std::to_string(nu);
+  const std::string description = "Lx"+std::to_string(Lx)+"Ly"+std::to_string(Ly)+"nu"+std::to_string(nu)+"theta"+std::to_string(theta);
+
+  set_all();
 
   {
     const int N = 2*Lx*Ly;
@@ -83,8 +86,8 @@ int main(int argc, char **argv){
   }
 
 
-  std::complex<long double> det_removed = 1.0;
-  long double pf_removed = 0.0;
+  std::complex<double> det_removed = 1.0;
+  double pf_removed = 0.0;
   {
     Eigen::MatrixXcd matD0 = get_Dirac_matrix();
 
@@ -107,7 +110,8 @@ int main(int argc, char **argv){
     Eigen::VectorXcd ev = ces.eigenvalues();
 
     int jj = 0, kk = 0;
-    for(auto elem : ev ) {
+    std::vector<std::complex<double>> vec(ev.data(), ev.data() + ev.rows() * ev.cols());
+    for(auto elem : vec) {
       if( std::abs(elem)>1.0e-14 ) {
         det_removed *= elem;
         kk++;
@@ -216,17 +220,21 @@ int main(int argc, char **argv){
   if(nu>=3) sx = -1;
   if(nu/2==1) sy = -1;
 
-  long double kappa_ = kappa;
+
+
+  double kappa_ = kappa[0];
+
 
   {
     // double Z = 1.0;
     Eigen::MatrixXcd C;
     Eigen::MatrixXcd D00 = Eigen::MatrixXcd::Zero(2,2);
-    std::complex<long double> tr, diff, Z, Z1, ZA, ZB, ZC;
-    long double check;
+    std::complex<double> tr, diff, Z, Z1, Z2, ZA, ZB, ZC;
+    double check;
     int len;
     Z = 1.0;
     Z1 = 1.0;
+    Z2 = 1.0;
 
     ZA = 0.0;
     ZB = 0.0;
@@ -277,6 +285,8 @@ int main(int argc, char **argv){
       ZA += std::pow(kappa_,len-1) * tr;
       ZB += std::pow(kappa_,len-1) * tr;
 
+      D00 += std::pow(kappa_,len) * C;
+      Z2 += std::pow(kappa_,len) * tr;
       // D00 += std::pow(kappa_,len) * C;
     }
 
@@ -309,8 +319,9 @@ int main(int argc, char **argv){
       // assert( std::abs(diff)<1.0e-14 );
       Z += std::pow(kappa_,len) * tr;
 
-      // D00 += std::pow(kappa_,len) * C;
+      D00 += std::pow(kappa_,len) * C;
       Z1 += std::pow(kappa_,len) * tr;
+      Z2 += std::pow(kappa_,len) * tr;
     }
 
     {
@@ -342,8 +353,9 @@ int main(int argc, char **argv){
       // assert( std::abs(diff)<1.0e-14 );
       Z += std::pow(kappa_,len) * tr;
 
-      // D00 += std::pow(kappa_,len) * C;
+      D00 += std::pow(kappa_,len) * C;
       Z1 += std::pow(kappa_,len) * tr;
+      Z2 += std::pow(kappa_,len) * tr;
     }
 
     {
@@ -360,7 +372,8 @@ int main(int argc, char **argv){
       ZA += std::pow(kappa_,len-1) * tr;
       ZB += std::pow(kappa_,len-1) * tr;
 
-      // D00 += std::pow(kappa_,len) * C;
+      D00 += std::pow(kappa_,len) * C;
+      Z2 += std::pow(kappa_,len) * tr;
     }
 
     {
@@ -413,7 +426,8 @@ int main(int argc, char **argv){
       ZA += std::pow(kappa_,len-1) * tr;
       ZB += std::pow(kappa_,len-1) * tr;
 
-      // D00 += std::pow(kappa_,len) * C;
+      D00 += std::pow(kappa_,len) * C;
+      Z2 += std::pow(kappa_,len) * tr;
     }
 
     {
@@ -429,8 +443,9 @@ int main(int argc, char **argv){
       // assert( std::abs(diff)<1.0e-14 );
       Z += std::pow(kappa_,len) * tr;
 
-      // D00 += std::pow(kappa_,len) * C;
+      D00 += std::pow(kappa_,len) * C;
       Z1 += std::pow(kappa_,len) * tr;
+      Z2 += std::pow(kappa_,len) * tr;
     }
 
     {
@@ -483,7 +498,8 @@ int main(int argc, char **argv){
       ZA += std::pow(kappa_,len-1) * tr;
       ZB += std::pow(kappa_,len-1) * tr;
 
-      // D00 += std::pow(kappa_,len) * C;
+      D00 += std::pow(kappa_,len) * C;
+      Z2 += std::pow(kappa_,len) * tr;
     }
 
     std::cout << "kappa_ = " << kappa_ << std::endl;
@@ -498,8 +514,10 @@ int main(int argc, char **argv){
     std::cout << "ZC/Z = " << ZC/Z << std::endl;
     std::cout << "pf_removed = " << pf_removed << std::endl;
     std::cout << "Z1/Z' = " << Z1/pf_removed << std::endl;
-    // std::cout << "D00 = " << D00 << std::endl;
-    // std::cout << "D00/Z = " << D00/Z << std::endl;
+    std::cout << "Z2/Z' = " << Z2/Z << std::endl;
+
+    std::cout << "D00 = " << D00 << std::endl;
+    std::cout << "D00/Z = " << D00/Z << std::endl;
   }
 
 
@@ -508,7 +526,7 @@ int main(int argc, char **argv){
     Vect Dinv1(2*Lx*Ly);
 
     {
-      std::ifstream ifs( dir_data+description+"Dinv_0_0_0_cuda.dat",
+      std::ifstream ifs( dir_data+description+"Dinv_0_0_0.dat",
                          std::ios::in | std::ios::binary );
       if(!ifs) assert(false);
 
@@ -522,7 +540,7 @@ int main(int argc, char **argv){
 
 
     {
-      std::ifstream ifs( dir_data+description+"Dinv_0_0_1_cuda.dat",
+      std::ifstream ifs( dir_data+description+"Dinv_0_0_1.dat",
                          std::ios::in | std::ios::binary );
       if(!ifs) assert(false);
 
@@ -558,19 +576,19 @@ int main(int argc, char **argv){
 
 
 
-  {
-    std::cout << "zero mode." << std::endl;
-    Eigen::MatrixXcd matD0 = get_Dirac_matrix();
-    Vect e = Eigen::VectorXcd::Zero(2*Lx*Ly);
-    // for(int i=0; i<2*Lx*Ly; i++) e( i ) = 1.0;
-    for(int i=0; i<Lx*Ly; i++) e( 2*i+1 ) = 1.0;
-    std::cout << "De0 = " << std::endl;
-    auto v1 = matD0 * e;
-    std::cout << v1 << std::endl;
-    std::cout << v1.norm() << std::endl;
-    std::cout << "Ddag e0 = " << std::endl;
-    std::cout << matD0.adjoint() * e << std::endl;
-  }
+  // {
+  //   std::cout << "zero mode." << std::endl;
+  //   Eigen::MatrixXcd matD0 = get_Dirac_matrix();
+  //   Vect e = Eigen::VectorXcd::Zero(2*Lx*Ly);
+  //   // for(int i=0; i<2*Lx*Ly; i++) e( i ) = 1.0;
+  //   for(int i=0; i<Lx*Ly; i++) e( 2*i+1 ) = 1.0;
+  //   std::cout << "De0 = " << std::endl;
+  //   auto v1 = matD0 * e;
+  //   std::cout << v1 << std::endl;
+  //   std::cout << v1.norm() << std::endl;
+  //   std::cout << "Ddag e0 = " << std::endl;
+  //   std::cout << matD0.adjoint() * e << std::endl;
+  // }
 
 
 

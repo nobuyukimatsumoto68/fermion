@@ -24,15 +24,27 @@ int compare (const void * a, const void * b)
 int main(int argc, char **argv){
   std::cout << std::scientific << std::setprecision(15) << std::endl;
 
-  int nu=3;
-
-  if (argc>1){
-    for (int i = 0; i < argc; i++) {
-      nu = atoi(argv[1]);
-      printf("%s\n", argv[i]);
-    }
+  // int nu=3;
+  if(argc==2){
+    // for (int i = 0; i < argc; i++) {
+    nu = atoi(argv[1]);
+    printf("%s\n", argv[1]);
+    // }
   }
-  const std::string description = "Lx"+std::to_string(Lx)+"Ly"+std::to_string(Ly)+"nu"+std::to_string(nu);
+  if (argc==3){
+    // for (int i = 0; i < argc; i++) {
+    nu = atoi(argv[1]);
+    printf("%s\n", argv[1]);
+    tautil2 = atof(argv[2]);
+    std::cout << tautil2 << std::endl;
+    // }
+  }
+
+  set_all();
+  // const std::string description = "Lx"+std::to_string(Lx)+"Ly"+std::to_string(Ly)+"nu"+std::to_string(nu);
+  const std::string description = "Lx"+std::to_string(Lx)+"Ly"+std::to_string(Ly)+"nu"+std::to_string(nu)+"tautil"+std::to_string(tautil1)+"_"+std::to_string(tautil2)+str(is_periodic_orthogonal);
+
+  std::cout << description << std::endl;
 
   int device;
   cudacheck(cudaGetDeviceCount(&device));
@@ -226,6 +238,9 @@ int main(int argc, char **argv){
     std::cout << "nu = " << nu << std::endl
       //<< "log det = " << log_det << std::endl;
               << "log_abs_det_nozero = " << log_abs_det_nozero << std::endl;
+    std::ofstream of( dir_data+description+"eig.dat", std::ios::out | std::ios::trunc);
+    of << std::scientific << std::setprecision(15) << std::endl;
+    of << log_abs_det_nozero;
 
     std::cout << "zeros: " << std::endl;
     for(auto elem : zeros) std::cout << elem << " ";

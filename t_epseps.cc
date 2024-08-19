@@ -29,11 +29,14 @@ int main(int argc, char **argv){
     nu = atoi(argv[1]);
     // printf("%s\n", argv[i]);
   }
-  const std::string description = "Lx"+std::to_string(Lx)+"Ly"+std::to_string(Ly)+"nu"+std::to_string(nu);
+   set_all();
+  // const std::string description = "Lx"+std::to_string(Lx)+"Ly"+std::to_string(Ly)+"nu"+std::to_string(nu)+"tautil"+std::to_string(tautil1)+"_"+std::to_string(tautil2);
+  // const std::string description = "Lx"+std::to_string(Lx)+"Ly"+std::to_string(Ly)+"nu"+std::to_string(nu)+"tautil"+std::to_string(tautil1)+"_"+std::to_string(tautil2);
+   const std::string description = "Lx"+std::to_string(Lx)+"Ly"+std::to_string(Ly)+"nu"+std::to_string(nu)+"tautil"+std::to_string(tautil1)+"_"+std::to_string(tautil2)+str(is_periodic_orthogonal);
 
 
-  const Idx xP = Lx/3+1;
-  const Idx yP = 0;
+  // const Idx xP = Lx/3+1;
+  // const Idx yP = 0;
 
   std::vector<M2> Dinv_n_0(Lx*Ly), Dinv_n_A(Lx*Ly), Dinv_n_B(Lx*Ly), Dinv_n_C(Lx*Ly), Dinv_n_P(Lx*Ly);
 
@@ -42,7 +45,7 @@ int main(int argc, char **argv){
     Vect Dinv1(2*Lx*Ly);
 
     {
-      std::ifstream ifs( dir_data+description+"Dinv_0_0_0_cuda.dat",
+      std::ifstream ifs( dir_data+description+"Dinv_0_0_0.dat",
                          std::ios::in | std::ios::binary );
       if(!ifs) assert(false);
 
@@ -56,7 +59,7 @@ int main(int argc, char **argv){
 
 
     {
-      std::ifstream ifs( dir_data+description+"Dinv_0_0_1_cuda.dat",
+      std::ifstream ifs( dir_data+description+"Dinv_0_0_1.dat",
                          std::ios::in | std::ios::binary );
       if(!ifs) assert(false);
 
@@ -86,7 +89,7 @@ int main(int argc, char **argv){
     Vect Dinv1(2*Lx*Ly);
 
     {
-      std::ifstream ifs( dir_data+description+"Dinv_m1_0_0_cuda.dat",
+      std::ifstream ifs( dir_data+description+"Dinv_m1_0_0.dat",
                          std::ios::in | std::ios::binary );
       if(!ifs) assert(false);
 
@@ -100,7 +103,7 @@ int main(int argc, char **argv){
 
 
     {
-      std::ifstream ifs( dir_data+description+"Dinv_m1_0_1_cuda.dat",
+      std::ifstream ifs( dir_data+description+"Dinv_m1_0_1.dat",
                          std::ios::in | std::ios::binary );
       if(!ifs) assert(false);
 
@@ -130,7 +133,7 @@ int main(int argc, char **argv){
     Vect Dinv1(2*Lx*Ly);
 
     {
-      std::ifstream ifs( dir_data+description+"Dinv_1_m1_0_cuda.dat",
+      std::ifstream ifs( dir_data+description+"Dinv_1_m1_0.dat",
                          std::ios::in | std::ios::binary );
       if(!ifs) assert(false);
 
@@ -144,7 +147,7 @@ int main(int argc, char **argv){
 
 
     {
-      std::ifstream ifs( dir_data+description+"Dinv_1_m1_1_cuda.dat",
+      std::ifstream ifs( dir_data+description+"Dinv_1_m1_1.dat",
                          std::ios::in | std::ios::binary );
       if(!ifs) assert(false);
 
@@ -174,7 +177,7 @@ int main(int argc, char **argv){
     Vect Dinv1(2*Lx*Ly);
 
     {
-      std::ifstream ifs( dir_data+description+"Dinv_0_1_0_cuda.dat",
+      std::ifstream ifs( dir_data+description+"Dinv_0_1_0.dat",
                          std::ios::in | std::ios::binary );
       if(!ifs) assert(false);
 
@@ -188,7 +191,7 @@ int main(int argc, char **argv){
 
 
     {
-      std::ifstream ifs( dir_data+description+"Dinv_0_1_1_cuda.dat",
+      std::ifstream ifs( dir_data+description+"Dinv_0_1_1.dat",
                          std::ios::in | std::ios::binary );
       if(!ifs) assert(false);
 
@@ -219,7 +222,7 @@ int main(int argc, char **argv){
     Vect Dinv1(2*Lx*Ly);
 
     {
-      std::ifstream ifs( dir_data+description+"Dinv_xP_yP_0_cuda.dat",
+      std::ifstream ifs( dir_data+description+"Dinv_xP_yP_0.dat",
                          std::ios::in | std::ios::binary );
       if(!ifs) assert(false);
 
@@ -233,7 +236,7 @@ int main(int argc, char **argv){
 
 
     {
-      std::ifstream ifs( dir_data+description+"Dinv_xP_yP_1_cuda.dat",
+      std::ifstream ifs( dir_data+description+"Dinv_xP_yP_1.dat",
                          std::ios::in | std::ios::binary );
       if(!ifs) assert(false);
 
@@ -275,6 +278,7 @@ int main(int argc, char **argv){
 #pragma omp parallel for num_threads(nparallel)
 #endif
     for(int n=0; n<THREE; n++){
+      // for(const int n0 : {0,1,2}){
 
       int dum1,dum2;
       int sign1 = cshift(dum1, dum2, 0, 0, n);
@@ -293,8 +297,11 @@ int main(int argc, char **argv){
       for(int y=0; y<Ly; y++){
         for(int x=0; x<Lx; x++){
           if(!is_site(x,y)) continue;
-          const int ch = mod(x-y, 3);
-          if(ch!=0) continue;
+          // const int ch = mod(x-y, 3);
+          // if(ch!=0) continue;
+          // if(!is_link(x,y,s)) s+=3;
+          // if(!is_link(x,y,s)) continue;
+          // const int ch = mod(x-y, 3);
 
           const M2& Dinv_x_0 = Dinv_n_0[idx(x,y)];
           const M2& Dinv_x_0pn = sign1 * Dinv_n_0pn[idx(x,y)];
@@ -347,8 +354,8 @@ int main(int argc, char **argv){
       for(int y=0; y<Ly; y++){
         for(int x=0; x<Lx; x++){
           if(!is_site(x,y)) continue;
-          const int ch = mod(x-y, 3);
-          if(ch!=0) continue;
+          // const int ch = mod(x-y, 3);
+          // if(ch!=0) continue;
 
           const M2& Dinv_x_0pn = sign1 * Dinv_n_0pn[idx(x,y)];
 
@@ -391,8 +398,8 @@ int main(int argc, char **argv){
     for(int y=0; y<Ly; y++){
       for(int x=0; x<Lx; x++){
         if(!is_site(x,y)) continue;
-        const int ch = mod(x-y, 3);
-        if(ch!=0) continue;
+        // const int ch = mod(x-y, 3);
+        // if(ch!=0) continue;
 
         const M2& Dinv_x_0 = Dinv_n_0[idx(x,y)];
         const M2& Dinv_P_0 = Dinv_n_0[idx(xP,yP)];
